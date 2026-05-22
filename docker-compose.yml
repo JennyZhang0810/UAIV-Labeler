@@ -1,0 +1,21 @@
+name: uaiv-labeler
+
+services:
+  uaiv-labeler:
+    build: .
+    container_name: uaiv-labeler
+    ports:
+      - "7860:7860"
+    environment:
+      URBAN_ANNOTATION_HOST: 0.0.0.0
+      URBAN_ANNOTATION_PORT: 7860
+      UAIV_HISTORY_KEEP: 10
+      UAIV_BROWSE_ROOTS: /app/sample_data:/datasets
+      UAIV_DEFAULT_BROWSE_PATH: /app/sample_data
+      UAIV_QA_ROOT: /app/sample_data/qa
+    volumes:
+      - ./data:/app/data
+      - ./exports:/app/exports
+      - ./logs:/app/logs
+      # Mount large external datasets here, then import /datasets/... in the UI.
+      # - /your/dataset/root:/datasets:ro

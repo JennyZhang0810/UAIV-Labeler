@@ -1,0 +1,16 @@
+{
+  "note": "Copy this file to config/model_backends.json and fill your local model paths. Do not commit private absolute paths or model weights.",
+  "models": {
+    "s2det_yolov8s": {
+      "enabled": true,
+      "mode": "local",
+      "name": "Object Detection · s2det-yolov8s",
+      "task": "object_detection",
+      "provider": "S2Det / Ultralytics",
+      "python": "/your/conda/envs/yolov8/bin/python",
+      "weights": "/your/models/s2det-yolov8s/best.pt",
+      "metric_source": "/your/models/s2det-yolov8s/results.csv",
+      "description": "Low-altitude remote-sensing object detector."
+    }
+  }
+}

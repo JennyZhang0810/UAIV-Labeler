@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "review_threshold": 50,
+  "webhook_url": "",
+  "timeout": 10
+}

@@ -1,0 +1,10 @@
+.git
+.agents
+.codex
+__pycache__/
+*.pyc
+data/client_uploads/
+data/tile_cache/
+data/history/
+exports/
+logs/*.log

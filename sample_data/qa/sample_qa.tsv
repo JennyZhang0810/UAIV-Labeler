@@ -1,0 +1,6 @@
+index	question	A	B	C	D	answer	category	l2-category	image_path
+0	What activity is most visible in the image?	Bulldozer operation	Ship navigation	School sports	Vehicle parking	A	urban_event	construction	../images/bulldozer1.png
+1	Which event should be reviewed in this image?	Straw burning	Water pollution	OCR sign reading	Bridge damage	A	ecology_event	burning	../images/burning1.png
+2	What environmental issue is likely present?	Water pollution	Hotel sign	OCR plate	Normal traffic	A	ecology_event	water_pollution	../images/water_pollution1.png
+3	Which target category is most relevant?	Garbage pile	Communication tower	Crane	Ship	A	urban_event	garbage	../images/garbage1.png
+

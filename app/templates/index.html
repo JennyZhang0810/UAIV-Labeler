@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>遥感半自动化标注平台</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260520_uaiv_labeler">
+  </head>
+  <body>
+    <div id="toastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+    <div id="processingOverlay" class="processing-overlay hidden" aria-live="polite" aria-atomic="true">
+      <div class="processing-card">
+        <strong id="processingTitle">模型处理中</strong>
+        <p id="processingMessage">正在生成预标注，请稍候。</p>
+        <div class="processing-bar"><span></span></div>
+      </div>
+    </div>
+    <aside class="project-rail">
+      <div class="rail-brand">UAIV</div>
+      <button class="rail-item active" data-rail-view="home" type="button">首页</button>
+      <button class="rail-item" data-rail-view="workbench" type="button">工作台</button>
+      <button class="rail-item" data-rail-view="qa" type="button">QA 核查</button>
+      <button class="rail-item" data-rail-view="deploy" type="button">部署</button>
+      <button class="rail-item" data-rail-view="guide" type="button">说明</button>
+      <div class="rail-footer">
+        <span>Low-altitude<br>Annotation</span>
+        <a href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </aside>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">UAIV</div>
+        <div>
+          <h1>遥感半自动化标注平台</h1>
+          <p>Metadata 管理 · 模型预标注 · 人工复核 · Benchmark 导出</p>
+        </div>
+      </div>
+      <div class="actions">
+        <div class="nav-row">
+          <label class="language-switch">语言
+            <select id="languageSelect">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+          <div class="nav-links" aria-hidden="true">
+            <button id="showHome" class="nav-action active" type="button">首页</button>
+            <button id="showWorkbench" class="nav-action" type="button">工作台</button>
+            <button id="showQaTools" class="nav-action" type="button">QA 工具</button>
+            <button id="showDeploy" class="nav-action" type="button">外部部署</button>
+            <button id="showGuide" class="nav-action" type="button">使用说明</button>
+          </div>
+          <button id="refreshStats">刷新统计</button>
+        </div>
+        <div class="export-row">
+          <div class="export-control">
+            <span class="action-group-label">服务器导出</span>
+            <select data-export-format="server" aria-label="服务器导出格式">
+              <option value="json">JSON</option>
+              <option value="coco">COCO</option>
+              <option value="voc">VOC</option>
+              <option value="qa">QA</option>
+            </select>
+            <button data-export-run="server" type="button">导出</button>
+          </div>
+          <div class="export-control">
+            <span class="action-group-label">本地下载</span>
+            <select data-export-format="local" aria-label="本地下载格式">
+              <option value="json">JSON</option>
+              <option value="coco">COCO</option>
+              <option value="voc">VOC</option>
+              <option value="qa">QA</option>
+            </select>
+            <button data-export-run="local" type="button">下载</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="homeView" class="home-view">
+      <section class="home-shell">
+        <div class="home-hero panel">
+          <div>
+            <span class="home-kicker">UAIV-Labeler</span>
+            <h2>低空遥感多任务数据构建工作台</h2>
+            <p>面向无人机多场景、多天气、多高度影像，统一管理 Metadata、模型预标注、人工复核、QA 核查和 Benchmark 导出，支撑城市大模型、生态大模型与图像复原数据生产。</p>
+            <div class="home-actions">
+              <button class="home-primary" data-home-action="workbench" type="button">进入标注工作台</button>
+              <button data-home-action="qa" type="button">进入 QA 核查</button>
+              <a class="home-link-button" href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+          <div class="home-metrics">
+            <div><span>Data</span><strong>Metadata-first</strong></div>
+            <div><span>Workflow</span><strong>Pre-label + Review</strong></div>
+            <div><span>Export</span><strong>COCO / VOC / QA</strong></div>
+          </div>
+        </div>
+
+        <section class="home-section">
+          <div class="home-section-head">
+            <h3>任务入口</h3>
+            <p>先选择数据建设方向，再进入对应标注流程。</p>
+          </div>
+          <div class="home-task-grid">
+            <button class="home-task-card" data-home-domain="urban" type="button">
+              <span>Urban FM</span>
+              <strong>城市大模型</strong>
+              <p>场景识别、目标检测/计数、事件 QA、OCR、城市结构理解。</p>
+            </button>
+            <button class="home-task-card" data-home-domain="ecology" type="button">
+              <span>Ecology FM</span>
+              <strong>生态大模型</strong>
+              <p>林地、农田、湖泊、湿地及生态事件与污染核查。</p>
+            </button>
+            <button class="home-task-card" data-home-domain="restoration" type="button">
+              <span>Restoration</span>
+              <strong>图像复原</strong>
+              <p>雨、雾、红外等退化类型、退化程度与清晰图像配对。</p>
+            </button>
+          </div>
+        </section>
+
+        <section class="home-section uaiv-dataset panel">
+          <div>
+            <span class="home-kicker">Published Dataset</span>
+            <h3>UAIV 低空多模态数据集</h3>
+            <p>UAIV 面向低空城市智能，覆盖多场景、多模态、多条件真实无人机影像，支持场景理解、时空学习、图像复原和城市治理相关 Benchmark 构建。本平台作为后续扩展数据的半自动化标注与核查工具，延续 UAIV 的 Metadata-first、多任务统一组织和可复用导出流程。</p>
+            <div class="dataset-links">
+              <a href="https://jennyzhang0810.github.io/LowAltitude-Multimodal-Dataset/" target="_blank" rel="noreferrer">Project Page</a>
+              <a href="https://github.com/JennyZhang0810/LowAltitude-Multimodal-Dataset/tree/main" target="_blank" rel="noreferrer">GitHub</a>
+              <a href="https://www.scidb.cn/detail?dataSetId=203705443be44f7882bb9ddfd7d401da" target="_blank" rel="noreferrer">ScienceDB</a>
+            </div>
+          </div>
+          <div class="dataset-highlights">
+            <div><span>Modalities</span><strong>RGB / IR / Metadata</strong></div>
+            <div><span>Conditions</span><strong>Rain · Snow · Fog · Haze</strong></div>
+            <div><span>Tasks</span><strong>Understanding · Restoration · Benchmark</strong></div>
+          </div>
+        </section>
+
+        <section class="home-section home-flow panel">
+          <div>
+            <h3>标准流程</h3>
+            <p>导入影像并建立索引，运行模型生成初始标注，人工复核后导出训练集和 Benchmark 文件。</p>
+          </div>
+          <ol>
+            <li>数据导入与 Metadata 校验</li>
+            <li>模型预标注与人工修正</li>
+            <li>QA 核查与评测结果复盘</li>
+            <li>COCO / VOC / JSON / QA 导出</li>
+          </ol>
+        </section>
+
+        <section class="home-section public-ready panel">
+          <div>
+            <span class="home-kicker">Open-source Ready</span>
+            <h3>三种使用方式，边界清楚</h3>
+            <p>离线 Demo、在线演示和服务器部署面向不同场景。离线 Demo 适合本机试用和手动标注；在线演示用于快速预览；服务器部署用于读取团队数据盘并接入真实模型环境。</p>
+          </div>
+          <div class="public-ready-grid">
+            <div><strong>Offline Demo</strong><span>本机 127.0.0.1 试用，默认读取 sample_data，不暴露公网。</span></div>
+            <div><strong>Online Demo</strong><span>公开地址用于预览，只能读取演示服务器上的数据。</span></div>
+            <div><strong>Server Deployment</strong><span>部署到团队服务器后，才能浏览该服务器或挂载盘数据。</span></div>
+            <div><strong>Model Plugin</strong><span>真实 YOLO / SAM / SegEarth / VLM 模型需在部署环境中配置。</span></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <main id="workbenchView" class="layout hidden">
+      <datalist id="objectLabelOptions"></datalist>
+      <aside class="sidebar">
+        <section class="panel task-domain-panel">
+          <div class="panel-head">
+            <h2>任务方向</h2>
+            <span>标注模式</span>
+          </div>
+          <label>选择任务方向
+            <select id="taskDomain">
+              <option value="urban">城市大模型</option>
+              <option value="ecology">生态大模型</option>
+              <option value="restoration">图像复原</option>
+            </select>
+          </label>
+          <div id="taskDomainHint" class="upload-summary">城市大模型：目标/区域标注 + QA 对标注 + 城市结构理解。</div>
+        </section>
+
+        <section class="panel import-panel">
+          <div class="panel-head">
+            <h2>数据导入</h2>
+            <span>批量建立索引</span>
+          </div>
+          <div class="import-tabs">
+            <button id="serverImportTab" class="tab-button active" type="button">服务器目录</button>
+            <button id="clientImportTab" class="tab-button" type="button">电脑本地</button>
+          </div>
+          <div id="serverImportPane" class="import-pane active">
+            <p class="hint">适合直接使用平台所在服务器或挂载盘中的大规模影像数据，导入时仅建立索引，不重复复制原图。</p>
+            <label>服务器路径
+              <div class="input-action">
+                <input id="folderPath" placeholder="sample_data/images 或 /datasets/your_images">
+                <button id="browseFolder" type="button">浏览</button>
+              </div>
+            </label>
+            <div id="folderBrowser" class="folder-browser"></div>
+            <div class="upload-summary" id="selectedFolderSummary">未选择服务器目录</div>
+            <label class="checkline"><input id="importRecursive" type="checkbox" checked> 递归扫描子目录</label>
+            <label class="checkline danger-check"><input id="replaceDataset" type="checkbox"> 清空当前图像索引后导入</label>
+          </div>
+
+          <div id="clientImportPane" class="import-pane">
+            <p class="hint">适合从当前电脑选择少量影像进行试用或补充导入，平台会自动完成上传与索引。</p>
+            <label>电脑本地文件夹
+              <input id="clientFolderFiles" type="file" webkitdirectory directory multiple>
+            </label>
+            <div class="upload-summary" id="clientUploadSummary">未选择文件夹</div>
+            <label class="checkline danger-check"><input id="replaceDatasetClient" type="checkbox"> 清空当前图像索引后导入</label>
+          </div>
+
+          <div class="metadata-block">
+            <h3>批量默认 Metadata</h3>
+            <div class="row">
+              <label>批次<input id="importBatch" placeholder="第二批"></label>
+              <label>飞行高度<input id="importAltitude" type="number" min="0" placeholder="m"></label>
+            </div>
+            <div class="row">
+              <label>经度<input id="importLongitude" type="number" step="0.000001" placeholder="104.397100"></label>
+              <label>纬度<input id="importLatitude" type="number" step="0.000001" placeholder="31.126400"></label>
+            </div>
+            <div class="row">
+              <label>场景<select id="importScene"><option value="">未标注</option></select></label>
+              <label>天气<select id="importWeather"><option value="">未知</option></select></label>
+            </div>
+            <label>默认任务
+              <select id="importTasks" multiple size="5"></select>
+            </label>
+          </div>
+          <button id="importFolder">开始导入</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>筛选</h2>
+            <span id="imageCount">0 张</span>
+          </div>
+          <label>任务<select id="taskFilter"><option value="">全部</option></select></label>
+          <p class="filter-help">用于在已导入/已索引图像中筛选待标注子集，不会重新读取目录。</p>
+          <label>场景<select id="sceneFilter"><option value="">全部</option></select></label>
+          <label>天气<select id="weatherFilter"><option value="">全部</option></select></label>
+          <label>批次<select id="batchFilter"><option value="">全部</option></select></label>
+          <label>数据来源
+            <select id="sourceTypeFilter">
+              <option value="">全部</option>
+              <option value="actual">实际数据</option>
+              <option value="demo">示例图</option>
+            </select>
+          </label>
+          <div class="row">
+            <label>最低高度<input id="minAltitude" type="number" min="0" placeholder="m"></label>
+            <label>最高高度<input id="maxAltitude" type="number" min="0" placeholder="m"></label>
+          </div>
+          <details class="advanced-filter">
+            <summary>空间范围筛选</summary>
+            <div class="row">
+              <label>最小经度<input id="minLongitude" type="number" step="0.000001" placeholder="min lon"></label>
+              <label>最大经度<input id="maxLongitude" type="number" step="0.000001" placeholder="max lon"></label>
+            </div>
+            <div class="row">
+              <label>最小纬度<input id="minLatitude" type="number" step="0.000001" placeholder="min lat"></label>
+              <label>最大纬度<input id="maxLatitude" type="number" step="0.000001" placeholder="max lat"></label>
+            </div>
+          </details>
+          <button id="applyFilters">应用筛选</button>
+        </section>
+
+        <section class="panel list-panel">
+          <h2>图像列表</h2>
+          <div id="imageList" class="image-list"></div>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <section class="summary-grid" id="summaryGrid"></section>
+        <div class="canvas-shell">
+          <canvas id="imageCanvas" width="1024" height="768"></canvas>
+        </div>
+        <div class="toolbar">
+          <button id="prevImage">上一张</button>
+          <button id="nextImage">下一张</button>
+          <input id="newBoxLabel" list="objectLabelOptions" placeholder="object label">
+          <button id="drawBoxMode">人工画框</button>
+          <button id="addBox">添加目标框</button>
+          <button id="undoAction">撤销上一步</button>
+          <button id="clearAnnotations">清除所有</button>
+          <button id="rerunPrediction">重新预标注</button>
+          <button id="saveReview">保存复核</button>
+          <span id="statusText">未选择图像</span>
+        </div>
+        <section class="model-center panel" data-domain-block="urban ecology">
+          <div class="panel-head">
+            <h2>模型中心</h2>
+            <span>智能预标注</span>
+          </div>
+          <div id="modelList" class="model-list"></div>
+          <div class="custom-model-box">
+            <div class="panel-head">
+              <h2>自定义模型接入</h2>
+              <span>可选扩展</span>
+            </div>
+            <p class="hint">可接入团队已有的检测、分割、OCR 或多任务模型，用于对当前图像生成初始标注，随后由人工复核确认。</p>
+            <div class="custom-model-grid">
+              <label>模型名称<input id="customModelName" placeholder="my_detector_v1"></label>
+              <label>任务类型
+                <select id="customModelTask">
+                  <option value="object_detection">object_detection</option>
+                  <option value="semantic_segmentation">semantic_segmentation</option>
+                  <option value="instance_segmentation">instance_segmentation</option>
+                  <option value="ocr">ocr</option>
+                  <option value="event_qa">event_qa</option>
+                  <option value="multi_task">multi_task</option>
+                </select>
+              </label>
+              <label class="custom-model-url">服务地址<input id="customModelUrl" placeholder="模型服务地址"></label>
+              <button id="runCustomModel" type="button">运行自定义模型</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="inspector">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Metadata</h2>
+            <span>自动读取</span>
+          </div>
+          <dl id="metadataView"></dl>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>标注复核</h2>
+            <span>人工确认</span>
+          </div>
+            <label>复核状态
+              <select id="reviewStatus">
+              <option value="predicted">模型预标注</option>
+              <option value="labeled">已标注</option>
+              <option value="verified">已核验</option>
+              <option value="rejected">驳回重标</option>
+              </select>
+            </label>
+          <label data-domain-field="urban ecology restoration">环境<select id="environmentLabel"></select></label>
+          <div class="annotation-module" data-domain-field="urban ecology">
+            <h3>目标与区域标注</h3>
+            <p class="hint">检测任务标注目标类别和 bbox；分割任务标注像素掩码。当前手动画框和模型预标注在中间工作区完成。</p>
+            <label>场景<select id="sceneLabel"></select></label>
+            <label>事件<select id="eventLabel"></select></label>
+          </div>
+          <div class="annotation-module" data-domain-field="urban ecology">
+            <h3>QA 对标注</h3>
+            <p class="hint">这里用于当前图像的 QA 标注；顶部 QA 工具用于已有 QA 数据集的核查。</p>
+            <label>QA 问题<textarea id="qaQuestion"></textarea></label>
+            <label>QA 答案<textarea id="qaAnswer"></textarea></label>
+          </div>
+          <div class="annotation-module" data-domain-field="urban">
+            <h3>城市结构理解</h3>
+            <label>城市结构理解<textarea id="urbanStructure"></textarea></label>
+          </div>
+          <div class="annotation-module" data-domain-field="restoration">
+            <h3>图像复原标注</h3>
+            <p class="hint">标注退化类型、退化程度和清晰图像配对关系。</p>
+            <label>复原退化类型<select id="degradationLabel"><option value="">无</option></select></label>
+            <label>退化程度
+              <select id="degradationLevel">
+                <option value="">未标注</option>
+                <option value="low">小</option>
+                <option value="medium">中</option>
+                <option value="high">大</option>
+              </select>
+            </label>
+            <label>清晰配对 ID<input id="clearPairId"></label>
+          </div>
+        </section>
+
+        <section class="panel" data-domain-block="urban ecology">
+          <div class="panel-head">
+            <h2>目标框</h2>
+            <span>检测/计数</span>
+          </div>
+          <div id="objectList" class="object-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>统计</h2>
+            <span>实时概览</span>
+          </div>
+          <pre id="statsView"></pre>
+        </section>
+      </aside>
+    </main>
+
+    <main id="qaToolsView" class="qa-tools-view hidden">
+      <section class="qa-tools-shell">
+        <div class="guide-hero">
+          <div>
+            <h2>QA 工具</h2>
+            <p>面向城市大模型 Benchmark 的 QA 数据核查与评测结果复盘。支持审阅题目、选项、正确答案、模型回答和推理过程，便于统一修订与质量控制。</p>
+          </div>
+        </div>
+
+        <section class="qa-grid">
+          <aside class="panel qa-file-panel">
+            <div class="panel-head">
+              <h2>文件选择</h2>
+              <span>TSV / XLSX</span>
+            </div>
+            <div class="qa-selected">
+              <div class="qa-source-block">
+                <h3>服务器读取</h3>
+                <p class="hint">读取平台服务器上的 QA 文件和配套图像目录，适合大规模数据集核查。</p>
+                <label>QA 目录
+                  <div class="input-action">
+                    <input id="qaFolderPath" value="sample_data/qa">
+                    <button id="qaBrowseFolder" type="button">浏览</button>
+                  </div>
+                </label>
+                <div id="qaFileBrowser" class="folder-browser"></div>
+                <label>QA 图像目录<input id="qaImageRoot" placeholder="选择或填写配套图像目录"></label>
+                <div class="qa-action-row">
+                  <button id="useQaTsvPath" type="button">使用选中 TSV 审题</button>
+                  <button id="useQaXlsxPath" type="button">使用选中 XLSX 结果</button>
+                </div>
+              </div>
+              <div class="qa-source-block">
+                <h3>电脑本地上传</h3>
+                <p class="hint">上传当前电脑中的 QA 文件；如题目无法自动显示图像，请继续上传对应图像文件夹。</p>
+                <div class="qa-local-upload">
+                  <label>电脑本地 QA 文件
+                    <input id="qaLocalFile" type="file" accept=".tsv,.xlsx">
+                  </label>
+                  <button id="uploadQaLocalFile" type="button">上传并使用</button>
+                  <div id="qaLocalUploadSummary" class="upload-summary">未选择本地 QA 文件</div>
+                </div>
+                <div class="qa-local-upload">
+                  <label>电脑本地 QA 图像文件夹
+                    <input id="qaLocalImageFiles" type="file" webkitdirectory directory multiple>
+                  </label>
+                  <button id="uploadQaLocalImages" type="button">上传图像文件夹</button>
+                  <div id="qaLocalImageSummary" class="upload-summary">未选择本地 QA 图像文件夹</div>
+                </div>
+              </div>
+              <details class="qa-source-block qa-advanced-paths">
+                <summary>高级：手动指定审阅文件</summary>
+                <p class="hint">通常无需使用。仅当文件不在列表中、需要粘贴完整路径，或需要重新加载特定结果文件时展开。</p>
+                <label>TSV 题目文件<input id="qaTsvPath" placeholder="/path/to/questions.tsv"></label>
+                <button id="loadQaTsv" type="button">加载 TSV 审题</button>
+                <label>XLSX 结果文件<input id="qaXlsxPath" placeholder="/path/to/result.xlsx"></label>
+                <label class="checkline"><input id="qaWrongOnly" type="checkbox"> 只看错误题</label>
+                <button id="loadQaResult" type="button">加载 XLSX 结果</button>
+              </details>
+            </div>
+          </aside>
+
+          <section class="panel qa-review-panel">
+            <div class="panel-head">
+              <h2>QA 题目核查</h2>
+              <span id="qaTsvMeta">未加载</span>
+            </div>
+            <p class="panel-note">用于核查和修订 QA 数据本身：题目、选项、正确答案和配套图像。</p>
+            <div class="qa-workspace">
+              <div class="qa-image-box"><img id="qaTsvImage" alt="QA image"></div>
+              <div class="qa-editor">
+                <div class="toolbar compact-toolbar">
+                  <button id="qaTsvPrev" type="button">上一题</button>
+                  <button id="qaTsvNext" type="button">下一题</button>
+                  <label>题号<input id="qaTsvRow" type="number" min="1"></label>
+                  <button id="qaTsvJump" type="button">跳转</button>
+                  <button id="qaTsvSave" type="button">保存 + 下一题</button>
+                </div>
+                <label>Question<textarea id="qaQuestionEdit" rows="3"></textarea></label>
+                <div class="qa-options">
+                  <label>A<input id="qaOptionA"></label>
+                  <label>B<input id="qaOptionB"></label>
+                  <label>C<input id="qaOptionC"></label>
+                  <label>D<input id="qaOptionD"></label>
+                </div>
+                <div class="answer-checks">
+                  <label><input type="checkbox" value="A"> A</label>
+                  <label><input type="checkbox" value="B"> B</label>
+                  <label><input type="checkbox" value="C"> C</label>
+                  <label><input type="checkbox" value="D"> D</label>
+                </div>
+                <div id="qaTsvStatus" class="upload-summary">请选择 TSV 文件</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel qa-result-panel">
+            <div class="panel-head">
+              <h2>评测结果复盘</h2>
+              <span id="qaResultMeta">未加载</span>
+            </div>
+            <p class="panel-note">用于查看模型评测后的 XLSX 结果：模型答案、正确答案、是否命中以及推理过程；不用于修改 QA 题库。</p>
+            <div class="qa-workspace">
+              <div class="qa-image-box"><img id="qaResultImage" alt="Result image"></div>
+              <div class="qa-editor">
+                <div class="toolbar compact-toolbar">
+                  <button id="qaResultPrev" type="button">上一题</button>
+                  <button id="qaResultNext" type="button">下一题</button>
+                  <label>题号<input id="qaResultRow" type="number" min="1"></label>
+                  <button id="qaResultJump" type="button">跳转</button>
+                </div>
+                <div class="qa-result-card">
+                  <h3 id="qaResultQuestion">Question</h3>
+                  <div id="qaResultOptions" class="qa-result-options"></div>
+                  <div class="qa-answer-grid">
+                    <div><span>正确答案</span><strong id="qaResultAnswer">-</strong></div>
+                    <div><span>模型答案</span><strong id="qaResultParsed">-</strong></div>
+                    <div><span>命中</span><strong id="qaResultHit">-</strong></div>
+                  </div>
+                  <span>模型回答 / 思考过程</span>
+                  <pre id="qaResultPrediction"></pre>
+                  <span>匹配日志</span>
+                  <pre id="qaResultLog"></pre>
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <main id="deployView" class="guide-view hidden">
+      <section class="guide-shell">
+        <div class="guide-hero">
+          <div>
+            <h2>外部部署</h2>
+            <p>当前公开入口可用于在线预览和轻量试用。若外部团队希望直接读取自己的服务器数据盘、运行自己的模型环境并长期保存导出结果，建议在其服务器上部署一套独立实例。</p>
+          </div>
+        </div>
+        <div class="guide-grid">
+          <nav class="guide-toc panel">
+            <h2>目录</h2>
+            <a href="#deploy-modes">使用方式</a>
+            <a href="#deploy-fast">快速启动</a>
+            <a href="#deploy-data">数据放置</a>
+            <a href="#deploy-public">公网访问</a>
+            <a href="#deploy-domain">域名与正式服务</a>
+            <a href="#deploy-limits">注意事项</a>
+          </nav>
+          <article class="guide-content panel">
+            <section id="deploy-modes">
+              <h2>1. 先区分三种使用方式</h2>
+              <table>
+                <tr><th>离线 Demo</th><td>在本机运行，只绑定 <code>127.0.0.1</code>，默认读取 <code>sample_data/</code>。适合快速试用、课堂展示、无公网环境下的手动标注流程演示。</td></tr>
+                <tr><th>在线演示</th><td>访问当前公开地址查看平台界面和流程。它只能读取演示服务器上的数据，不能直接访问访问者电脑或其他服务器的数据盘。</td></tr>
+                <tr><th>服务器部署</th><td>把平台部署到团队自己的服务器或挂载数据盘后，服务器目录导入才能浏览该机器上的大规模图像、TSV/XLSX 和模型输出。</td></tr>
+              </table>
+            </section>
+            <section id="deploy-fast">
+              <h2>2. 快速启动</h2>
+              <h3>离线 Demo</h3>
+              <pre>cd /path/to/UAIV-Labeler
+pip install -r requirements.txt
+bash offline_demo/run_offline.sh</pre>
+              <p>离线 Demo 默认打开 <code>http://127.0.0.1:7860</code>，只在当前电脑可见。</p>
+              <h3>服务器部署</h3>
+              <p>在团队服务器上准备 Python 环境后，进入平台目录并启动：</p>
+              <pre>cd /path/to/UAIV-Labeler
+pip install -r requirements.txt
+bash scripts/start_public.sh</pre>
+              <p>启动后访问：</p>
+              <pre>http://&lt;外部服务器IP&gt;:7860</pre>
+            </section>
+            <section id="deploy-data">
+              <h2>3. 数据放置</h2>
+              <p>推荐把图像、TSV、XLSX 放在同一台服务器的数据盘，例如：</p>
+              <pre>/data/UAIV/images
+/data/UAIV/QA/questions.tsv
+/data/UAIV/QA/results.xlsx</pre>
+              <p>如果使用 QA 工具，建议将 QA 文件和配套图像放在同一数据目录下；平台会根据题目中的图像信息自动匹配，必要时也可以手动指定 QA 图像目录。</p>
+            </section>
+            <section id="deploy-public">
+              <h2>4. 公网访问</h2>
+              <p>当前公开演示地址：</p>
+              <pre>http://121.48.163.156:7860</pre>
+              <p>其他服务器部署时，需要开放 7860 端口。云服务器还要在安全组/防火墙中放行 TCP 7860。</p>
+              <pre>http://&lt;server-ip&gt;:7860</pre>
+              <p><code>127.0.0.1</code> 只代表服务器本机内部访问，不能作为发给外部用户的公开链接。</p>
+            </section>
+            <section id="deploy-domain">
+              <h2>5. 域名与正式服务</h2>
+              <p>长期公开建议使用 Gunicorn + Nginx。仓库已提供模板：</p>
+              <pre>deploy/nginx_annotation.conf
+deploy/uaiv-labeler.service
+deploy/DOMAIN_DEPLOYMENT.md</pre>
+              <p>有 root 权限后，可按 <code>deploy/DOMAIN_DEPLOYMENT.md</code> 配置域名、Nginx 反向代理和 HTTPS。</p>
+            </section>
+            <section id="deploy-limits">
+              <h2>6. 注意事项</h2>
+              <ul>
+                <li>公开演示可以用当前 Flask 服务；正式多人使用建议加登录认证。</li>
+                <li>本地上传适合小规模 TSV/XLSX 或少量图片，大规模数据应使用服务器目录或挂载盘。</li>
+                <li>如果要使用本地 YOLO、SegEarth、SAM 等模型，外部服务器也需要配置对应环境和权重。</li>
+              </ul>
+            </section>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <main id="guideView" class="guide-view hidden">
+      <section class="guide-shell">
+        <div class="guide-hero">
+          <div>
+            <h2>平台使用说明</h2>
+            <p>面向低空遥感多任务数据集的半自动化标注流程：导入、筛选、模型预标注、人工复核、保存和导出。平台核心竞争力在于以 Metadata 为中心组织低空遥感数据，并把多任务标注、模型预标注、自定义模型接入和 Benchmark 导出放在同一工作流中。</p>
+          </div>
+        </div>
+
+        <div class="guide-grid">
+          <nav class="guide-toc panel">
+            <h2>目录</h2>
+            <a href="#guide-purpose">平台用途</a>
+            <a href="#guide-developer">开发者信息</a>
+            <a href="#guide-import">数据导入</a>
+            <a href="#guide-filter">列表与筛选</a>
+            <a href="#guide-metadata">Metadata</a>
+            <a href="#guide-annotation">人工标注</a>
+            <a href="#guide-models">模型预标注</a>
+            <a href="#guide-save">保存与快捷键</a>
+            <a href="#guide-export">导出</a>
+            <a href="#guide-faq">常见问题</a>
+            <a href="#guide-workflow">推荐流程</a>
+          </nav>
+
+          <article class="guide-content panel">
+            <section id="guide-purpose">
+              <h2>1. 平台用途</h2>
+              <p>本平台用于无人机低空遥感图像的半自动化标注，支持城市大模型、生态大模型和图像复原相关任务。它的重点不是单一画框工具，而是把 Metadata 管理、多任务标注、模型预标注、自定义模型接入和 Benchmark 导出整合到同一套数据生产流程中。</p>
+            </section>
+
+            <section id="guide-developer">
+              <h2>2. 开发者信息</h2>
+              <div class="developer-card">
+                <div>
+                  <h3>Jiening Zhang</h3>
+                  <p>UESTC 计算机方向博士生，研究方向包括 Computer Vision、Remote Sensing Generation、Data-centric AI、Low-shot Detection，以及低空多模态遥感数据集构建。</p>
+                  <p>GitHub：<a href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">https://github.com/JennyZhang0810/UAIV-Labeler</a></p>
+                </div>
+                <div class="developer-tags">
+                  <span>Remote Sensing</span>
+                  <span>Data-centric AI</span>
+                  <span>Low-shot Detection</span>
+                  <span>UAV Dataset</span>
+                  <span>Benchmark</span>
+                </div>
+              </div>
+            </section>
+
+            <section id="guide-files">
+              <h2>3. 数据与文件位置</h2>
+              <table>
+                <tbody>
+                  <tr><th>Metadata</th><td><code>data/metadata.json</code></td></tr>
+                  <tr><th>保存后的标注</th><td><code>data/annotations.json</code></td></tr>
+                  <tr><th>服务器导出</th><td><code>exports/</code></td></tr>
+                  <tr><th>完整说明文档</th><td><code>USER_GUIDE.md</code></td></tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section id="guide-import">
+              <h2>4. 数据导入</h2>
+              <h3>服务器目录</h3>
+              <p>适合直接使用平台所在服务器或挂载盘中的大规模影像数据，导入时仅建立索引，不重复复制原图。</p>
+              <ol>
+                <li>选择“服务器目录”。</li>
+                <li>输入路径或点击“浏览”。</li>
+                <li>填写批次、飞行高度、经纬度、天气、场景和默认任务。</li>
+                <li>点击“开始导入”或“使用当前目录”。</li>
+              </ol>
+              <h3>电脑本地</h3>
+              <p>适合从当前电脑选择少量影像进行试用或补充导入，平台会自动完成上传与索引。</p>
+              <p>导入完成后会在右上角弹出成功提示，并在工作台状态栏显示扫描数量、导入数量和跳过数量。</p>
+            </section>
+
+            <section id="guide-filter">
+              <h2>5. 图像列表与筛选</h2>
+              <p>左下角图像列表显示图像 ID、场景、批次、天气、高度、任务、复核状态和数据来源。数据来源分为“实际数据”和“示例图”。筛选条件包括任务、场景、天气、批次、数据来源和飞行高度范围。筛选只作用于已经导入/已索引图像，用来缩小当前标注子集，不会重新读取目录。</p>
+            </section>
+
+            <section id="guide-metadata">
+              <h2>6. Metadata</h2>
+              <p>右侧 Metadata 面板显示当前图像的文件路径、批次、拍摄时间、飞行高度、经纬度、天气、场景、任务、宽高、来源目录等信息。若显示“未提取/未填写”，说明图像没有可读 EXIF/GPS，或导入时未填写默认值。</p>
+            </section>
+
+            <section id="guide-annotation">
+              <h2>7. 人工标注</h2>
+              <h3>人工画框</h3>
+              <p>在工具栏输入目标类别，例如 <code>ship</code>、<code>vehicle</code>、<code>person</code>，点击“人工画框”，然后在图像上拖拽生成 bbox。右侧目标框列表可修改类别与坐标。</p>
+              <h3>添加目标框</h3>
+              <p>该按钮会在当前图像中心新增一个默认框，宽约原图 18%、高约原图 14%，类别取工具栏输入框。它适合快速放置一个可编辑框；如果要按真实位置画框，请使用“人工画框”。</p>
+              <h3>复核字段</h3>
+              <p>右侧“标注复核”可编辑场景、环境、事件、QA、图像复原配对和城市结构理解。</p>
+            </section>
+
+            <section id="guide-models">
+              <h2>8. 模型预标注</h2>
+              <p>模型中心位于图像工作区下方。当前目标检测模型为 <code>s2det-yolov8s</code>，用于低空遥感目标检测预标注；SegEarth-OV 用于语义分割预标注。模型运行完成后会提示生成结果数量，即使没有检测到有效目标，也会给出完成提示。</p>
+              <h3>自定义模型接入</h3>
+              <p>如果团队已有检测、分割、OCR 或多任务模型，可以在模型中心填写模型名称、任务类型和服务地址，用于生成当前图像的初始标注，再由人工复核确认。</p>
+              <p>高级接入时，模型服务需接收当前图像信息，并返回标准标注结果，例如目标框、分割区域、OCR 文本、事件或 QA 条目。</p>
+              <pre>{
+  "objects": [
+    {"label": "vehicle", "bbox": [120, 80, 60, 40], "score": 0.91, "status": "model:custom"}
+  ],
+  "segments": [],
+  "ocr": [],
+  "events": []
+}</pre>
+              <h3>SAM3 为什么暂未直接接入？</h3>
+              <p>SAM3 更适合带点、框或文本提示的交互式分割。后续会在提示交互和 GPU 服务模式稳定后，作为交互式分割工具接入平台。</p>
+            </section>
+
+            <section id="guide-save">
+              <h2>9. 保存与快捷键</h2>
+              <ul>
+                <li>点击“保存复核”：写入 <code>data/annotations.json</code>。</li>
+                <li><code>Ctrl+S</code> / <code>Command+S</code>：保存并自动切到下一张。</li>
+                <li><code>ArrowRight</code>：下一张。</li>
+                <li><code>ArrowLeft</code>：上一张。</li>
+                <li><code>Ctrl+Z</code> / <code>Command+Z</code>：撤销上一步。</li>
+              </ul>
+              <p>“清除所有”会清空当前图像的目标框、分割、OCR、事件、复原和结构理解字段，保存后生效。“重新预标注”用于重新生成当前图像的初始标注，保存前可撤销。</p>
+            </section>
+
+            <section id="guide-export">
+              <h2>10. 导出</h2>
+              <p>顶部导出分为“服务器导出”和“本地下载”。服务器导出写入 <code>exports/</code>；本地下载由浏览器下载到当前电脑，VOC 会自动打包为 <code>voc.zip</code>。</p>
+              <table>
+                <tbody>
+                  <tr><th>JSON</th><td>完整 Metadata 与标注，适合归档和平台复用。</td></tr>
+                  <tr><th>COCO</th><td>适合目标检测训练和评测。</td></tr>
+                  <tr><th>VOC</th><td>每张图一个 XML，适合传统检测流程。</td></tr>
+                  <tr><th>QA</th><td>JSONL 格式，适合事件理解和大模型 Benchmark。</td></tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section id="guide-faq">
+              <h2>11. 常见问题</h2>
+              <h3>为什么模型效果仍可能不好？</h3>
+              <p>当前目标检测已换为 <code>s2det-yolov8s</code>，比原通用模型更贴近遥感检测流程；但不同数据集的视角、高度、天气和类别分布仍可能不同。后续可用平台复核数据继续训练 UAIV 专用模型。</p>
+              <h3>为什么有些图没有经纬度？</h3>
+              <p>平台会尝试读取 EXIF/GPS。若图像没有这些信息，且导入时没有填写默认经纬度/高度，就会显示为空。</p>
+              <h3>为什么旧图一打开有框？</h3>
+              <p>早期版本曾自动生成示例预标注。已写入的旧框不会自动删除，避免误删复核数据；可用“清除所有”后保存。</p>
+              <h3>框坐标是原图坐标吗？</h3>
+              <p>是。前端可能缩放显示大图，但保存和导出的 bbox 均为原图坐标。</p>
+            </section>
+
+            <section id="guide-workflow">
+              <h2>12. 推荐工作流</h2>
+              <ol>
+                <li>导入一批图像，并填写批次、天气、场景、任务等默认 Metadata。</li>
+                <li>用筛选功能选择一个任务子集。</li>
+                <li>运行对应模型做预标注。</li>
+                <li>人工复核目标框、场景、事件和 QA。</li>
+                <li>使用 <code>Ctrl+S</code> 保存并自动进入下一张。</li>
+                <li>定期刷新统计查看进度。</li>
+                <li>阶段性导出 JSON、COCO、VOC 或 QA。</li>
+                <li>用导出数据训练更适合低空遥感的模型，再接回平台。</li>
+              </ol>
+            </section>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js?v=20260520_uaiv_labeler"></script>
+  </body>
+</html>

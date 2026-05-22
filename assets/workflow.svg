@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+  <title id="title">UAIV annotation workflow</title>
+  <desc id="desc">Workflow from folder indexing to model pre-annotation, human review, QA inspection and benchmark export.</desc>
+  <rect width="1280" height="420" rx="28" fill="#ffffff"/>
+  <rect x="24" y="24" width="1232" height="372" rx="24" fill="#f8fafc" stroke="#e4e7ec"/>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="64" y="78" font-size="28" font-weight="800" fill="#101828">Data-to-Benchmark Closed Loop</text>
+    <text x="64" y="112" font-size="16" fill="#667085">Designed for low-altitude UAV remote-sensing datasets</text>
+    <g transform="translate(64 170)">
+      <g>
+        <rect width="190" height="116" rx="18" fill="#e6fbff" stroke="#00a7c8"/>
+        <text x="24" y="42" font-size="18" font-weight="800" fill="#101828">1. Import</text>
+        <text x="24" y="72" font-size="14" fill="#475467">Server folder</text>
+        <text x="24" y="94" font-size="14" fill="#475467">Local upload</text>
+      </g>
+      <path d="M206 58H260" stroke="#98a2b3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M250 46L264 58L250 70" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(280 0)">
+        <rect width="190" height="116" rx="18" fill="#f2f4f7" stroke="#98a2b3"/>
+        <text x="24" y="42" font-size="18" font-weight="800" fill="#101828">2. Metadata</text>
+        <text x="24" y="72" font-size="14" fill="#475467">GPS · altitude</text>
+        <text x="24" y="94" font-size="14" fill="#475467">weather · batch</text>
+      </g>
+      <path d="M486 58H540" stroke="#98a2b3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M530 46L544 58L530 70" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(560 0)">
+        <rect width="190" height="116" rx="18" fill="#ebfff6" stroke="#12b76a"/>
+        <text x="24" y="42" font-size="18" font-weight="800" fill="#101828">3. Model</text>
+        <text x="24" y="72" font-size="14" fill="#475467">YOLO · SegEarth</text>
+        <text x="24" y="94" font-size="14" fill="#475467">SAM · custom API</text>
+      </g>
+      <path d="M766 58H820" stroke="#98a2b3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M810 46L824 58L810 70" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(840 0)">
+        <rect width="190" height="116" rx="18" fill="#fff4e5" stroke="#f79009"/>
+        <text x="24" y="42" font-size="18" font-weight="800" fill="#101828">4. Review</text>
+        <text x="24" y="72" font-size="14" fill="#475467">BBox · mask</text>
+        <text x="24" y="94" font-size="14" fill="#475467">QA · restoration</text>
+      </g>
+      <path d="M1046 58H1100" stroke="#98a2b3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M1090 46L1104 58L1090 70" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(1120 0)">
+        <rect width="96" height="116" rx="18" fill="#eef4ff" stroke="#6172f3"/>
+        <text x="22" y="42" font-size="18" font-weight="800" fill="#101828">5.</text>
+        <text x="22" y="72" font-size="14" fill="#475467">Export</text>
+        <text x="22" y="94" font-size="14" fill="#475467">Bench</text>
+      </g>
+    </g>
+  </g>
+</svg>
+

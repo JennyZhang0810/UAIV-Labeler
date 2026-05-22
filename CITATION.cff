@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use UAIV-Labeler, please cite the UAIV dataset/project and the related paper once available."
+title: "UAIV-Labeler"
+authors:
+  - family-names: "Zhang"
+    given-names: "Jiening"
+url: "https://github.com/JennyZhang0810"
+repository-code: "https://github.com/JennyZhang0810/UAIV-Labeler"
+date-released: 2026-05-20
+license: MIT
+keywords:
+  - low-altitude remote sensing
+  - UAV
+  - annotation
+  - metadata
+  - benchmark
+  - data-centric AI
+

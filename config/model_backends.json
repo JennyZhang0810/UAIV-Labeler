@@ -1,0 +1,55 @@
+{
+  "models": {
+    "s2det_yolov8s": {
+      "enabled": false,
+      "mode": "local",
+      "name": "Object Detection · s2det-yolov8s",
+      "task": "object_detection",
+      "provider": "S2Det / Ultralytics",
+      "python": "/path/to/conda/env/bin/python",
+      "weights": "/path/to/weights/best.pt",
+      "metric_source": "",
+      "description": "Optional local YOLOv8s detector. Set enabled=true after configuring python and weights."
+    },
+    "segearth_ov": {
+      "enabled": false,
+      "mode": "local",
+      "name": "Semantic Segmentation · SegEarth-OV",
+      "task": "semantic_segmentation",
+      "provider": "SegEarth",
+      "python": "/path/to/segearth/env/bin/python",
+      "repo": "/path/to/SegEarth-OV",
+      "weights": "/path/to/segearth/checkpoint.ckpt",
+      "clip_cache": "",
+      "name_file": "config/segearth_urban_labels.txt",
+      "description": "Optional local SegEarth-OV backend. Configure only when the environment and weights are available."
+    },
+    "sam3": {
+      "enabled": false,
+      "mode": "remote",
+      "name": "Interactive Segmentation · SAM",
+      "task": "instance_segmentation",
+      "provider": "SAM Backend",
+      "url": "http://127.0.0.1:9002/predict",
+      "description": "Recommended as a separate GPU model service for interactive segmentation."
+    },
+    "remote_detector": {
+      "enabled": false,
+      "mode": "remote",
+      "name": "Remote Model Service",
+      "task": "multi_task",
+      "provider": "HTTP Model Backend",
+      "url": "http://127.0.0.1:9001/predict",
+      "description": "Optional external model backend. You can also use the Custom Model block in the UI."
+    },
+    "mock_backend": {
+      "enabled": true,
+      "mode": "mock",
+      "name": "Demo Mock Pre-annotation",
+      "task": "multi_task",
+      "provider": "Platform",
+      "description": "Demo backend for testing the platform workflow without model dependencies."
+    }
+  }
+}
+

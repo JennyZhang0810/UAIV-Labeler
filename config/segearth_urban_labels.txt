@@ -1,0 +1,8 @@
+background
+road
+water,river,lake
+cropland,farmland
+wetland,park
+building,roof,house
+tree,forest
+bareland,sand

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-labelledby="title desc">
+  <title id="title">UAIV-Labeler</title>
+  <desc id="desc">Banner for a low-altitude UAV remote-sensing annotation platform.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="0.55" stop-color="#eef8ff"/>
+      <stop offset="1" stop-color="#f1fff8"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00a7c8"/>
+      <stop offset="1" stop-color="#12b76a"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#101828" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="420" rx="36" fill="url(#bg)"/>
+  <g opacity="0.42" stroke="#98a2b3" stroke-width="1">
+    <path d="M0 72H1400M0 144H1400M0 216H1400M0 288H1400M0 360H1400"/>
+    <path d="M90 0V420M180 0V420M270 0V420M360 0V420M450 0V420M540 0V420M630 0V420M720 0V420M810 0V420M900 0V420M990 0V420M1080 0V420M1170 0V420M1260 0V420"/>
+  </g>
+  <g transform="translate(84 76)">
+    <rect x="0" y="0" width="568" height="268" rx="22" fill="#fff" filter="url(#shadow)"/>
+    <rect x="26" y="26" width="516" height="150" rx="14" fill="#101828"/>
+    <path d="M44 126L142 78L236 104L342 54L524 138V176H44Z" fill="#12b76a" opacity="0.58"/>
+    <path d="M44 145L132 118L206 132L302 91L524 154V176H44Z" fill="#00a7c8" opacity="0.48"/>
+    <rect x="76" y="58" width="120" height="74" fill="none" stroke="#00f0ff" stroke-width="4"/>
+    <rect x="326" y="82" width="96" height="58" fill="none" stroke="#00ff94" stroke-width="4"/>
+    <path d="M66 202H240M66 229H348M66 247H288" stroke="#d0d5dd" stroke-width="12" stroke-linecap="round"/>
+    <g transform="translate(392 200)">
+      <rect width="128" height="44" rx="12" fill="url(#cyan)"/>
+      <path d="M31 22H98" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+      <path d="M78 10L100 22L78 34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <g transform="translate(734 76)">
+    <text x="0" y="38" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" fill="#00a7c8">UAIV-Labeler</text>
+    <text x="0" y="102" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="800" fill="#101828">Metadata-first UAV</text>
+    <text x="0" y="164" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="800" fill="#101828">annotation workspace</text>
+    <text x="0" y="218" font-family="Inter, Arial, sans-serif" font-size="22" fill="#475467">Folder indexing · Model pre-annotation · QA review · Benchmark export</text>
+    <g transform="translate(0 256)" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">
+      <rect width="142" height="46" rx="23" fill="#e6fbff"/>
+      <text x="24" y="30" fill="#007c91">COCO</text>
+      <rect x="162" width="142" height="46" rx="23" fill="#ebfff6"/>
+      <text x="192" y="30" fill="#067647">VOC</text>
+      <rect x="324" width="142" height="46" rx="23" fill="#f2f4f7"/>
+      <text x="358" y="30" fill="#344054">QA</text>
+      <rect x="486" width="170" height="46" rx="23" fill="#fff4e5"/>
+      <text x="516" y="30" fill="#b54708">Metadata</text>
+    </g>
+  </g>
+</svg>
+

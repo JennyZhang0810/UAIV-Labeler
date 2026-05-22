@@ -1,0 +1,59 @@
+[
+  {
+    "id": "sample_bulldozer1",
+    "file_name": "bulldozer1.png",
+    "image_path": "sample_data/images/bulldozer1.png",
+    "batch": "sample",
+    "capture_time": "2026-05-20T00:00:00",
+    "flight_height_m": 120,
+    "longitude": 104.3971,
+    "latitude": 31.1264,
+    "weather": "clear",
+    "scene": "construction_site",
+    "tasks": ["object_detection", "event_qa"],
+    "source_type": "demo"
+  },
+  {
+    "id": "sample_burning1",
+    "file_name": "burning1.png",
+    "image_path": "sample_data/images/burning1.png",
+    "batch": "sample",
+    "capture_time": "2026-05-20T00:00:00",
+    "flight_height_m": 150,
+    "longitude": 104.3982,
+    "latitude": 31.1271,
+    "weather": "haze",
+    "scene": "farmland",
+    "tasks": ["object_detection", "event_qa"],
+    "source_type": "demo"
+  },
+  {
+    "id": "sample_water_pollution1",
+    "file_name": "water_pollution1.png",
+    "image_path": "sample_data/images/water_pollution1.png",
+    "batch": "sample",
+    "capture_time": "2026-05-20T00:00:00",
+    "flight_height_m": 180,
+    "longitude": 104.399,
+    "latitude": 31.128,
+    "weather": "cloudy",
+    "scene": "river",
+    "tasks": ["semantic_segmentation", "event_qa"],
+    "source_type": "demo"
+  },
+  {
+    "id": "sample_garbage1",
+    "file_name": "garbage1.png",
+    "image_path": "sample_data/images/garbage1.png",
+    "batch": "sample",
+    "capture_time": "2026-05-20T00:00:00",
+    "flight_height_m": 100,
+    "longitude": 104.4001,
+    "latitude": 31.1291,
+    "weather": "clear",
+    "scene": "urban_village",
+    "tasks": ["object_detection", "event_qa"],
+    "source_type": "demo"
+  }
+]
+
