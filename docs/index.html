@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="UAIV-Labeler is a lightweight semi-automatic annotation platform for low-altitude UAV remote-sensing datasets.">
+  <title>UAIV-Labeler | Low-altitude UAV Annotation Platform</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #5f6673;
+      --line: #e5e7eb;
+      --paper: #ffffff;
+      --soft: #f7f8fb;
+      --accent: #ff4f3f;
+      --accent-dark: #d93428;
+      --green: #12a182;
+      --gold: #d7971d;
+      --violet: #6956d8;
+      --shadow: 0 22px 70px rgba(17, 24, 39, 0.12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "Noto Sans", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #fff 0%, #fbfbfd 44%, #fff 100%);
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.82);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 70px;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 19px;
+      white-space: nowrap;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-weight: 750;
+      font-size: 14px;
+      box-shadow: 0 1px 0 rgba(17, 24, 39, 0.04);
+    }
+
+    .button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .button.primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    .hero {
+      padding: 78px 0 36px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(430px, 1.08fr);
+      align-items: center;
+      gap: 46px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #4b5563;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 680px;
+      font-size: clamp(48px, 7vw, 84px);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 26px 0 0;
+      max-width: 620px;
+      color: #3f4652;
+      font-size: 19px;
+      line-height: 1.72;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 34px;
+      max-width: 620px;
+    }
+
+    .stat {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .product-shot {
+      position: relative;
+    }
+
+    .product-frame {
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #dfe3ea;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .product-frame img {
+      width: 100%;
+      aspect-ratio: 1312 / 816;
+      object-fit: cover;
+    }
+
+    .floating-note {
+      position: absolute;
+      right: 22px;
+      bottom: -24px;
+      width: min(330px, 70%);
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 18px 48px rgba(17, 24, 39, 0.16);
+      font-size: 14px;
+      line-height: 1.55;
+      color: #303744;
+    }
+
+    section {
+      padding: 78px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 30px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(32px, 4.5vw, 54px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 440px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .feature {
+      min-height: 230px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #fff;
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 850;
+      margin-bottom: 22px;
+    }
+
+    .feature:nth-child(1) .icon { background: var(--accent); }
+    .feature:nth-child(2) .icon { background: var(--green); }
+    .feature:nth-child(3) .icon { background: var(--violet); }
+    .feature:nth-child(4) .icon { background: var(--gold); }
+
+    .feature h3 {
+      margin: 0 0 10px;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.68;
+      font-size: 15px;
+    }
+
+    .showcase {
+      background: var(--soft);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .showcase-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .showcase-copy h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1.04;
+    }
+
+    .showcase-copy p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.76;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 10px;
+      color: #303744;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .check::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: radial-gradient(circle at center, var(--accent) 0 35%, #ffe1dd 38% 100%);
+    }
+
+    .tabs {
+      display: grid;
+      gap: 16px;
+    }
+
+    .screen {
+      overflow: hidden;
+      border: 1px solid #dfe3ea;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 14px 40px rgba(17, 24, 39, 0.08);
+    }
+
+    .screen img {
+      width: 100%;
+      aspect-ratio: 1312 / 816;
+      object-fit: cover;
+    }
+
+    .screen-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .step {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 24px;
+      min-height: 245px;
+    }
+
+    .step-number {
+      color: var(--accent);
+      font-weight: 850;
+      font-size: 14px;
+      margin-bottom: 34px;
+    }
+
+    .step h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.68;
+    }
+
+    .code-panel {
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #252a36;
+      background: #111827;
+      color: #d1d5db;
+      box-shadow: var(--shadow);
+    }
+
+    .code-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      border-bottom: 1px solid #263041;
+      color: #f9fafb;
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 22px;
+      overflow-x: auto;
+      font: 14px/1.7 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .mode {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 22px;
+      min-height: 210px;
+    }
+
+    .mode strong {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .mode p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .cta {
+      padding: 72px 0 88px;
+      background: #111827;
+      color: #fff;
+    }
+
+    .cta-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .cta h2 {
+      margin: 0 0 16px;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.05;
+    }
+
+    .cta p {
+      margin: 0;
+      max-width: 720px;
+      color: #cbd5e1;
+      font-size: 17px;
+      line-height: 1.72;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .cta .button {
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    .cta .button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0;
+      color: var(--muted);
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .nav-links a:not(.button) {
+        display: none;
+      }
+
+      .hero-grid,
+      .showcase-grid,
+      .two-col,
+      .cta-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid,
+      .workflow-grid,
+      .mode-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: 18px;
+      }
+
+      .cta-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 28px, 1180px);
+      }
+
+      .nav-inner {
+        min-height: 64px;
+      }
+
+      .brand {
+        font-size: 17px;
+      }
+
+      .nav-links .button {
+        min-height: 38px;
+        padding: 0 12px;
+      }
+
+      .hero {
+        padding-top: 52px;
+      }
+
+      h1 {
+        font-size: 46px;
+      }
+
+      .lead {
+        font-size: 17px;
+      }
+
+      .stats,
+      .feature-grid,
+      .workflow-grid,
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .floating-note {
+        position: static;
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      section {
+        padding: 58px 0;
+      }
+
+      .showcase-copy {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="shell nav-inner">
+      <a class="brand" href="#">
+        <span class="mark">UA</span>
+        <span>UAIV-Labeler</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">能力</a>
+        <a href="#workflow">流程</a>
+        <a href="#start">启动</a>
+        <a href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
+        <a class="button primary" href="http://121.48.163.156:7860">在线演示</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Open-source UAV annotation workspace</div>
+          <h1>UAIV-Labeler</h1>
+          <p class="lead">
+            面向低空无人机遥感数据集的半自动标注平台。它把 Metadata、模型预标注、人工复核、QA 核查和 Benchmark 导出放在同一个工作流里，适合城市治理、生态监测和多模态数据构建。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="http://121.48.163.156:7860">打开在线演示</a>
+            <a class="button" href="https://github.com/JennyZhang0810/UAIV-Labeler">查看开源代码</a>
+            <a class="button" href="#start">本地运行</a>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <strong>3</strong>
+              <span>离线 Demo、在线演示、服务器部署</span>
+            </div>
+            <div class="stat">
+              <strong>8+</strong>
+              <span>COCO、VOC、YOLO、DOTA、GeoJSON 等导出格式</span>
+            </div>
+            <div class="stat">
+              <strong>UAV</strong>
+              <span>围绕低空遥感场景设计</span>
+            </div>
+          </div>
+        </div>
+        <div class="product-shot">
+          <div class="product-frame">
+            <img src="site-assets/workbench.png" alt="UAIV-Labeler annotation workbench screenshot">
+          </div>
+          <div class="floating-note">
+            服务器目录导入只建立索引，不复制大规模原始图像；模型结果先进入预标注，再由人工复核保存。
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="features">
+      <div class="shell">
+        <div class="section-head">
+          <h2>不是通用画框工具，而是低空遥感数据生产台。</h2>
+          <p>页面结构借鉴现代开源产品站点，但内容围绕 UAIV-Labeler 自身能力组织：数据索引、模型辅助、几何标注、QA 与导出。</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="icon">M</div>
+            <h3>Metadata-first</h3>
+            <p>批次、飞行高度、经纬度、天气、场景和任务类型进入标注流程，方便筛选、质控和数据发布。</p>
+          </article>
+          <article class="feature">
+            <div class="icon">AI</div>
+            <h3>模型辅助标注</h3>
+            <p>连接 YOLO、SegEarth、SAM 类服务、OCR、VLM 或自定义 HTTP 后端，把预测结果交给人工复核。</p>
+          </article>
+          <article class="feature">
+            <div class="icon">QA</div>
+            <h3>QA 与评测复盘</h3>
+            <p>支持 TSV QA 核查、XLSX 评测结果复盘，以及图像级事件、文本问答和多任务审核。</p>
+          </article>
+          <article class="feature">
+            <div class="icon">EX</div>
+            <h3>Benchmark 导出</h3>
+            <p>导出 JSON、COCO、VOC、YOLO、YOLO-OBB、DOTA、GeoJSON、Mask PNG 和 QA JSONL。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="shell showcase-grid">
+        <div class="showcase-copy">
+          <div>
+            <h2>从图像导入到复核导出，一页完成核心工作。</h2>
+            <p>标注员可以在同一个工作台里切换普通框、旋转框、多边形区域和 QA 任务；管理员可以围绕数据源、模型后端和导出格式组织生产流程。</p>
+          </div>
+          <div class="check-list">
+            <div class="check">水平框、旋转框、逐点多边形区域，适配无人机视角下的目标与区域标注。</div>
+            <div class="check">可读 JSON 作为主存储，SQLite 侧向索引用于筛选、状态统计和后续团队协作。</div>
+            <div class="check">内置样例数据，克隆仓库后即可用本机 Demo 体验完整流程。</div>
+          </div>
+        </div>
+        <div class="tabs">
+          <figure class="screen">
+            <img src="site-assets/qa-review.png" alt="UAIV-Labeler QA review screenshot">
+            <figcaption class="screen-caption">
+              <span>QA Review</span>
+              <span>TSV / XLSX / JSONL</span>
+            </figcaption>
+          </figure>
+          <figure class="screen">
+            <img src="site-assets/model-integration.png" alt="UAIV-Labeler model integration screenshot">
+            <figcaption class="screen-caption">
+              <span>Model Backends</span>
+              <span>YOLO / SAM / OCR / VLM</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <div class="shell">
+        <div class="section-head">
+          <h2>围绕真实数据构建流程设计。</h2>
+          <p>适合实验室、团队服务器和公开演示三类场景，避免把“本机试用”和“公网部署”混在一起。</p>
+        </div>
+        <div class="workflow-grid">
+          <article class="step">
+            <div class="step-number">01</div>
+            <h3>索引数据</h3>
+            <p>从服务器目录或浏览器本地文件导入，保留原始路径和 Metadata，不强制复制大规模 UAV 图像。</p>
+          </article>
+          <article class="step">
+            <div class="step-number">02</div>
+            <h3>预标注与复核</h3>
+            <p>模型先生成候选结果，人工在工作台中修正、确认并保存，降低重复劳动。</p>
+          </article>
+          <article class="step">
+            <div class="step-number">03</div>
+            <h3>导出与发布</h3>
+            <p>面向训练、Benchmark、论文和数据集发布生成导出文件、质控报告和 Dataset Card。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="showcase">
+      <div class="shell two-col">
+        <div>
+          <div class="section-head">
+            <h2>开源仓库可以直接承载这个展示页。</h2>
+          </div>
+          <div class="mode-grid">
+            <article class="mode">
+              <strong>Offline Demo</strong>
+              <p>本机体验和课堂演示，默认使用仓库内 sample_data，不暴露公网服务。</p>
+            </article>
+            <article class="mode">
+              <strong>Online Demo</strong>
+              <p>通过公网地址快速查看平台界面和流程，后续可替换为正式域名。</p>
+            </article>
+            <article class="mode">
+              <strong>Server Deploy</strong>
+              <p>部署到实验室服务器或挂载数据盘，连接本机 GPU 模型或远程模型服务。</p>
+            </article>
+          </div>
+        </div>
+        <div class="code-panel">
+          <div class="code-title">
+            <span>Quick start</span>
+            <span>Python 3.10+</span>
+          </div>
+          <pre><code>git clone https://github.com/JennyZhang0810/UAIV-Labeler.git
+cd UAIV-Labeler
+pip install -r requirements.txt
+bash offline_demo/run_offline.sh
+
+# Open locally
+http://127.0.0.1:7860</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell two-col">
+        <figure class="screen">
+          <img src="site-assets/metadata.png" alt="UAIV-Labeler metadata-first management screenshot">
+          <figcaption class="screen-caption">
+            <span>Metadata-first Data Management</span>
+            <span>Scenes / Weather / Altitude / Tasks</span>
+          </figcaption>
+        </figure>
+        <div>
+          <div class="section-head">
+            <h2>为 UAIV 风格数据集持续扩展。</h2>
+          </div>
+          <div class="check-list">
+            <div class="check">城市治理：火点烟雾、垃圾堆放、河湖污染、挖机作业、交通拥堵、违章停车。</div>
+            <div class="check">生态与农业：植被受损、农田湿地监测、生态退化区域标注。</div>
+            <div class="check">多模态任务：事件 QA、OCR、图像复原配对和结构理解。</div>
+            <div class="check">后续路线：完整离线包、交互式分割、大图瓦片浏览和多人协作审计。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="shell cta-inner">
+        <div>
+          <h2>先用 GitHub Pages 上线，域名通过后再绑定。</h2>
+          <p>这个页面已经按 `docs` 目录部署方式组织。仓库 Settings 里启用 GitHub Pages，Source 选择 `main` 分支 `/docs` 目录即可；正式域名申请完成后再在 Pages 里添加 Custom domain。</p>
+        </div>
+        <div class="cta-actions">
+          <a class="button primary" href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub Repository</a>
+          <a class="button" href="http://121.48.163.156:7860">Live Demo</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <span>UAIV-Labeler · Low-altitude UAV remote-sensing annotation platform</span>
+      <div class="footer-links">
+        <a href="https://github.com/JennyZhang0810/UAIV-Labeler/blob/main/README_zh.md">中文文档</a>
+        <a href="DEPLOYMENT.md">部署说明</a>
+        <a href="CUSTOM_MODEL.md">模型接入</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
