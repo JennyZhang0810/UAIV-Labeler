@@ -346,10 +346,15 @@
       align-items: stretch;
     }
 
+    .showcase-stack {
+      display: grid;
+      gap: 22px;
+    }
+
     .showcase-copy {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       padding: 28px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -435,6 +440,31 @@
       font-weight: 650;
     }
 
+    .interface-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .interface-point {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .interface-point strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .interface-point span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
     .workflow-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -505,7 +535,7 @@
 
     .mode-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 14px;
     }
 
@@ -890,6 +920,7 @@
       .workflow-grid,
       .mode-grid,
       .task-grid,
+      .interface-points,
       .project-grid,
       .architecture,
       .roadmap-grid {
@@ -948,6 +979,7 @@
       .workflow-grid,
       .mode-grid,
       .task-grid,
+      .interface-points,
       .project-grid,
       .architecture,
       .roadmap-grid,
@@ -1150,47 +1182,33 @@ bash offline_demo/run_offline.sh</code></pre>
     </section>
 
     <section class="showcase">
-      <div class="shell showcase-grid">
-        <div class="showcase-copy">
+      <div class="shell showcase-stack">
+        <div class="section-head">
           <div>
             <h2>One workbench for annotation, model review, and QA.</h2>
             <p>Annotators can switch between boxes, oriented boxes, polygons, and QA review. Dataset builders can organize image sources, model backends, metadata, and export formats without gluing multiple tools together.</p>
           </div>
-          <div class="check-list">
-            <div class="check">Server-folder import indexes large image collections without copying original data.</div>
-            <div class="check">Readable JSON remains the source of truth, with SQLite side indexes for filtering and status summaries.</div>
-            <div class="check">Sample data is bundled, so a new user can clone the repository and run a local demo immediately.</div>
-          </div>
         </div>
-        <div class="tabs">
-          <figure class="screen">
-            <img src="site-assets/workbench.png" alt="UAIV-Labeler annotation workbench screenshot">
-            <figcaption class="screen-caption">
-              <span>Annotation Workbench</span>
-              <span>Box / OBB / Polygon</span>
-            </figcaption>
-          </figure>
-          <figure class="screen">
-            <img src="site-assets/qa-review.png" alt="UAIV-Labeler QA review screenshot">
-            <figcaption class="screen-caption">
-              <span>QA Review</span>
-              <span>TSV / XLSX / JSONL</span>
-            </figcaption>
-          </figure>
-          <figure class="screen">
-            <img src="site-assets/model-backends.jpg" alt="UAIV-Labeler model integration screenshot">
-            <figcaption class="screen-caption">
-              <span>Model Backends</span>
-              <span>YOLO / SAM / OCR / VLM</span>
-            </figcaption>
-          </figure>
-          <figure class="screen">
-            <img src="site-assets/metadata.png" alt="UAIV-Labeler metadata-first management screenshot">
-            <figcaption class="screen-caption">
-              <span>Metadata Management</span>
-              <span>Scenes / Weather / Altitude / Tasks</span>
-            </figcaption>
-          </figure>
+        <figure class="screen">
+          <img src="site-assets/workbench.png" alt="UAIV-Labeler annotation workbench screenshot">
+          <figcaption class="screen-caption">
+            <span>Annotation Workbench</span>
+            <span>Box / OBB / Polygon / QA / Export</span>
+          </figcaption>
+        </figure>
+        <div class="interface-points">
+          <article class="interface-point">
+            <strong>Server-folder indexing</strong>
+            <span>Index large image collections without copying original data into the web app.</span>
+          </article>
+          <article class="interface-point">
+            <strong>Model-assisted review</strong>
+            <span>Send images and metadata to YOLO, SegEarth, SAM-style, OCR/VLM, or custom HTTP backends.</span>
+          </article>
+          <article class="interface-point">
+            <strong>Benchmark-ready export</strong>
+            <span>Keep readable JSON as the source of truth and export training or QA benchmark files.</span>
+          </article>
         </div>
       </div>
     </section>
@@ -1317,16 +1335,20 @@ bash offline_demo/run_offline.sh</code></pre>
       <div class="shell two-col">
         <div>
           <div class="section-head">
-            <h2>Run locally, preview online, or deploy on a lab server.</h2>
+            <h2>Project website and platform deployment are separate.</h2>
           </div>
           <div class="mode-grid">
+            <article class="mode">
+              <strong>Project Website</strong>
+              <p>This GitHub Pages site is a static product page. It does not run the annotation backend.</p>
+            </article>
             <article class="mode">
               <strong>Offline Demo</strong>
               <p>Local trial with bundled sample_data. Useful for students, demos, and air-gapped previews.</p>
             </article>
             <article class="mode">
               <strong>Online Demo</strong>
-              <p>Quickly inspect the hosted interface and workflow before deploying your own data.</p>
+              <p>Hosted Flask app for inspecting the interface and workflow before deploying your own data.</p>
             </article>
             <article class="mode">
               <strong>Server Deploy</strong>
