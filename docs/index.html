@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="UAIV Dataset Engine is an open-source data production platform for low-altitude remote-sensing datasets, with UAIV-Labeler as its annotation and review module.">
-  <title>UAIV Dataset Engine | Data Production Platform for Low-altitude Remote Sensing</title>
+  <meta name="description" content="UAIV-Labeler is an open-source data production and annotation platform for low-altitude remote-sensing datasets.">
+  <title>UAIV-Labeler | Data Production Platform for Low-altitude Remote Sensing</title>
   <style>
     :root {
       --ink: #111827;
@@ -162,14 +162,9 @@
     h1 {
       margin: 0;
       max-width: 680px;
-      font-size: clamp(52px, 6.4vw, 78px);
-      line-height: 0.92;
+      font-size: clamp(52px, 6.8vw, 84px);
+      line-height: 0.94;
       letter-spacing: 0;
-    }
-
-    h1 .line {
-      display: block;
-      white-space: nowrap;
     }
 
     .lead {
@@ -256,15 +251,12 @@
     }
 
     .floating-note {
-      position: absolute;
-      right: 22px;
-      bottom: -24px;
-      width: min(330px, 70%);
+      margin-top: 12px;
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
-      box-shadow: 0 18px 48px rgba(17, 24, 39, 0.16);
+      box-shadow: 0 12px 34px rgba(17, 24, 39, 0.08);
       font-size: 14px;
       line-height: 1.55;
       color: #303744;
@@ -963,12 +955,6 @@
         grid-template-columns: 1fr;
       }
 
-      .floating-note {
-        position: static;
-        width: 100%;
-        margin-top: 12px;
-      }
-
       section {
         padding: 58px 0;
       }
@@ -984,7 +970,7 @@
     <div class="shell nav-inner">
       <a class="brand" href="#">
         <span class="mark">UA</span>
-        <span>UAIV Engine</span>
+        <span>UAIV-Labeler</span>
       </a>
       <div class="nav-links">
         <a href="#tasks">Tasks</a>
@@ -1002,10 +988,10 @@
     <header class="hero">
       <div class="shell hero-grid">
         <div>
-          <div class="eyebrow"><span class="dot"></span> UAIV-Labeler is the annotation module of the UAIV ecosystem</div>
-          <h1><span class="line">UAIV</span><span class="line">Dataset Engine</span></h1>
+          <div class="eyebrow"><span class="dot"></span> Open-source data production platform for aerial observation datasets</div>
+          <h1>UAIV-Labeler</h1>
           <p class="lead">
-            Build low-altitude remote-sensing datasets beyond boxes. The current open-source module, UAIV-Labeler, combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one workflow.
+            Build low-altitude remote-sensing datasets beyond boxes. UAIV-Labeler combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one workflow.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="http://121.48.163.156:7860">Live Demo</a>
@@ -1425,7 +1411,7 @@ http://127.0.0.1:7860</code></pre>
 
   <footer>
     <div class="shell footer-inner">
-      <span>UAIV Dataset Engine · Data production infrastructure for low-altitude remote sensing</span>
+      <span>UAIV-Labeler · Data production infrastructure for low-altitude remote sensing</span>
       <div class="footer-links">
         <a href="https://github.com/JennyZhang0810/UAIV-Labeler/blob/main/README_zh.md">中文文档</a>
         <a href="DEPLOYMENT.md">部署说明</a>
