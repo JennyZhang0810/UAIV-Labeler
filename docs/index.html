@@ -683,54 +683,48 @@
       font-size: 14px;
     }
 
-    .flow-board {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      align-items: stretch;
+    .flow-figure {
+      overflow: hidden;
+      border: 1px solid #dfe3ea;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
     }
 
-    .flow-step {
-      position: relative;
-      min-height: 154px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
+    .flow-figure img {
+      width: 100%;
+      aspect-ratio: 1376 / 768;
+      object-fit: contain;
       background: #fff;
     }
 
-    .flow-step::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -15px;
-      width: 16px;
-      height: 2px;
-      background: var(--accent);
-    }
-
-    .flow-step:nth-child(4)::after,
-    .flow-step:last-child::after {
-      display: none;
-    }
-
-    .flow-step small {
-      display: block;
-      margin-bottom: 20px;
-      color: var(--accent);
-      font-weight: 850;
-    }
-
-    .flow-step strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-
-    .flow-step span {
+    .flow-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.55;
+      line-height: 1.5;
+    }
+
+    .flow-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .flow-tags span {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 12px;
+      font-weight: 750;
     }
 
     .roadmap-grid {
@@ -901,13 +895,11 @@
       .task-grid,
       .project-grid,
       .architecture,
-      .flow-board,
       .roadmap-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .arch-node::after,
-      .flow-step::after {
+      .arch-node::after {
         display: none;
       }
 
@@ -961,7 +953,6 @@
       .task-grid,
       .project-grid,
       .architecture,
-      .flow-board,
       .roadmap-grid,
       .publication {
         grid-template-columns: 1fr;
@@ -1212,48 +1203,22 @@ bash offline_demo/run_offline.sh</code></pre>
           <h2>Dataset Production Flow</h2>
           <p>A complete loop from raw imagery and metadata to model assistance, human review, quality control, benchmark export, and dataset release assets.</p>
         </div>
-        <div class="flow-board">
-          <article class="flow-step">
-            <small>01</small>
-            <strong>Raw Imagery</strong>
-            <span>Server folders, browser uploads, flight batches, and paired image assets.</span>
-          </article>
-          <article class="flow-step">
-            <small>02</small>
-            <strong>Metadata Indexing</strong>
-            <span>Altitude, GPS, weather, scene, source, task type, timestamp, and review status.</span>
-          </article>
-          <article class="flow-step">
-            <small>03</small>
-            <strong>Pre-annotation</strong>
-            <span>YOLO, SegEarth, SAM-style prompts, OCR/VLM backends, and custom HTTP predictors.</span>
-          </article>
-          <article class="flow-step">
-            <small>04</small>
-            <strong>Human Review</strong>
-            <span>Detection boxes, oriented boxes, polygons, masks, QA answers, and paired-image checks.</span>
-          </article>
-          <article class="flow-step">
-            <small>05</small>
-            <strong>Event QA</strong>
-            <span>Question options, model answers, ground truth, image evidence, and reasoning traces.</span>
-          </article>
-          <article class="flow-step">
-            <small>06</small>
-            <strong>Quality Control</strong>
-            <span>Low-confidence flags, missing metadata checks, status summaries, and conflict review.</span>
-          </article>
-          <article class="flow-step">
-            <small>07</small>
-            <strong>Benchmark Export</strong>
-            <span>COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, Mask PNG, and QA JSONL.</span>
-          </article>
-          <article class="flow-step">
-            <small>08</small>
-            <strong>Dataset Release</strong>
-            <span>Dataset Card, README assets, release notes, and paper-ready workflow summaries.</span>
-          </article>
-        </div>
+        <figure class="flow-figure">
+          <img src="site-assets/dataset-production-flow.png.png" alt="Dataset production flow from raw imagery and metadata indexing to pre-annotation, human review, quality control, benchmark export, and dataset release">
+          <figcaption class="flow-caption">
+            <span>Raw data to benchmark-ready release assets in one metadata-first workflow.</span>
+            <div class="flow-tags">
+              <span>Raw Imagery</span>
+              <span>Metadata</span>
+              <span>Pre-annotation</span>
+              <span>Human Review</span>
+              <span>QA</span>
+              <span>QC</span>
+              <span>Export</span>
+              <span>Release</span>
+            </div>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
