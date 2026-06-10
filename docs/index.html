@@ -683,6 +683,139 @@
       font-size: 14px;
     }
 
+    .flow-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 154px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      width: 16px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .flow-step:nth-child(4)::after,
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-step small {
+      display: block;
+      margin-bottom: 20px;
+      color: var(--accent);
+      font-weight: 850;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .flow-step span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .roadmap-item {
+      min-height: 168px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .roadmap-item.done {
+      border-color: rgba(18, 161, 130, 0.34);
+      background: #f3fffb;
+    }
+
+    .roadmap-item.next {
+      border-color: rgba(255, 79, 63, 0.28);
+      background: #fff8f7;
+    }
+
+    .roadmap-item small {
+      display: block;
+      margin-bottom: 22px;
+      font-weight: 850;
+      color: var(--muted);
+    }
+
+    .roadmap-item.done small {
+      color: var(--green);
+    }
+
+    .roadmap-item.next small {
+      color: var(--accent);
+    }
+
+    .roadmap-item strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 19px;
+    }
+
+    .roadmap-item span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .publication-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .publication {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .publication small {
+      color: var(--accent);
+      font-weight: 850;
+    }
+
+    .publication strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+
+    .publication span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
     .cta {
       padding: 72px 0 88px;
       background: #111827;
@@ -767,11 +900,14 @@
       .mode-grid,
       .task-grid,
       .project-grid,
-      .architecture {
+      .architecture,
+      .flow-board,
+      .roadmap-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .arch-node::after {
+      .arch-node::after,
+      .flow-step::after {
         display: none;
       }
 
@@ -824,7 +960,10 @@
       .mode-grid,
       .task-grid,
       .project-grid,
-      .architecture {
+      .architecture,
+      .flow-board,
+      .roadmap-grid,
+      .publication {
         grid-template-columns: 1fr;
       }
 
@@ -856,6 +995,7 @@
         <a href="#compare">Why UAIV</a>
         <a href="#install">Install</a>
         <a href="#architecture">Architecture</a>
+        <a href="#roadmap">Roadmap</a>
         <a href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
         <a class="button primary" href="http://121.48.163.156:7860">在线演示</a>
       </div>
@@ -866,10 +1006,10 @@
     <header class="hero">
       <div class="shell hero-grid">
         <div>
-          <div class="eyebrow"><span class="dot"></span> Open-source data engine for UAV datasets</div>
+          <div class="eyebrow"><span class="dot"></span> Open-source data engine for aerial observation datasets</div>
           <h1>UAIV-Labeler</h1>
           <p class="lead">
-            Build low-altitude UAV datasets beyond boxes. UAIV-Labeler combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one open-source workflow.
+            Build low-altitude remote-sensing datasets beyond boxes. UAIV-Labeler combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one open-source workflow.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="http://121.48.163.156:7860">Live Demo</a>
@@ -878,16 +1018,16 @@
           </div>
           <div class="stats">
             <div class="stat">
-              <strong>10+</strong>
-              <span>annotation and review task types</span>
+              <strong>50+</strong>
+              <span>metadata fields for flight, scene, task, and review context</span>
             </div>
             <div class="stat">
               <strong>8+</strong>
               <span>export formats for training and benchmark</span>
             </div>
             <div class="stat">
-              <strong>QA</strong>
-              <span>multimodal event review, OCR, and VLM results</span>
+              <strong>10+</strong>
+              <span>annotation and multimodal review task types</span>
             </div>
           </div>
           <div id="install" class="hero-code">
@@ -902,7 +1042,7 @@ bash offline_demo/run_offline.sh</code></pre>
             <img src="site-assets/sample-preview.gif" alt="UAIV-Labeler demo workflow animation">
           </div>
           <div class="floating-note">
-            Import UAV imagery, run pre-annotation, revise boxes or regions, review QA, then export benchmark-ready files.
+            Import drone-collected imagery, run pre-annotation, revise boxes or regions, review QA, then export benchmark-ready files.
           </div>
         </div>
       </div>
@@ -912,12 +1052,12 @@ bash offline_demo/run_offline.sh</code></pre>
       <div class="shell">
         <div class="section-head">
           <h2>Supported Tasks</h2>
-          <p>UAIV-Labeler is built for multi-task UAV dataset construction, not only object detection.</p>
+          <p>UAIV-Labeler is built for multi-task aerial observation data construction, not only object detection.</p>
         </div>
         <div class="task-grid">
           <article class="task">
             <strong>Detection</strong>
-            <span>Horizontal bounding boxes for common UAV objects and events.</span>
+            <span>Horizontal bounding boxes for common aerial-view objects and events.</span>
           </article>
           <article class="task">
             <strong>Oriented Detection</strong>
@@ -937,7 +1077,7 @@ bash offline_demo/run_offline.sh</code></pre>
           </article>
           <article class="task">
             <strong>Restoration Pair</strong>
-            <span>Pair and inspect degraded/restored UAV images for restoration tasks.</span>
+            <span>Pair and inspect degraded/restored low-altitude images for restoration tasks.</span>
           </article>
         </div>
       </div>
@@ -947,7 +1087,7 @@ bash offline_demo/run_offline.sh</code></pre>
       <div class="shell">
         <div class="section-head">
           <h2>Why UAIV-Labeler?</h2>
-          <p>CVAT and Label Studio are excellent general tools. UAIV-Labeler focuses on low-altitude remote-sensing dataset production where metadata, event QA, model-assisted review, and benchmark export belong in the same workflow.</p>
+          <p>CVAT and Label Studio are excellent general tools. UAIV-Labeler focuses on low-altitude remote-sensing dataset production where metadata, event QA, model-assisted review, and benchmark export are native parts of the same workflow.</p>
         </div>
         <div class="compare-wrap">
           <table class="compare-table" aria-label="UAIV-Labeler comparison with CVAT and Label Studio">
@@ -961,34 +1101,34 @@ bash offline_demo/run_offline.sh</code></pre>
             </thead>
             <tbody>
               <tr>
-                <td>UAV metadata workflow</td>
-                <td class="no">No</td>
-                <td class="no">No</td>
-                <td class="yes">Yes</td>
+                <td>Aerial metadata workflow</td>
+                <td class="partial">Limited</td>
+                <td class="partial">Limited</td>
+                <td class="yes">Native</td>
               </tr>
               <tr>
                 <td>Oriented bounding boxes</td>
-                <td class="yes">Yes</td>
+                <td class="yes">Native</td>
                 <td class="partial">Partial</td>
-                <td class="yes">Yes</td>
+                <td class="yes">Native</td>
               </tr>
               <tr>
                 <td>Event QA review</td>
-                <td class="no">No</td>
-                <td class="no">No</td>
-                <td class="yes">Yes</td>
+                <td class="partial">External</td>
+                <td class="partial">External</td>
+                <td class="yes">Native</td>
               </tr>
               <tr>
                 <td>Benchmark export</td>
                 <td class="partial">Partial</td>
                 <td class="partial">Partial</td>
-                <td class="yes">Yes</td>
+                <td class="yes">Native</td>
               </tr>
               <tr>
-                <td>Multi-task UAV dataset workflow</td>
-                <td class="no">No</td>
-                <td class="no">No</td>
-                <td class="yes">Yes</td>
+                <td>Multi-task remote-sensing workflow</td>
+                <td class="partial">External</td>
+                <td class="partial">External</td>
+                <td class="yes">Native</td>
               </tr>
             </tbody>
           </table>
@@ -1000,7 +1140,7 @@ bash offline_demo/run_offline.sh</code></pre>
       <div class="shell">
         <div class="section-head">
           <h2>From import to review to export, without leaving the workspace.</h2>
-          <p>Designed for labs building UAV datasets for urban governance, ecology, agriculture, restoration, and multimodal foundation-model benchmarks.</p>
+          <p>Designed for labs building low-altitude imagery datasets for urban governance, ecology, agriculture, restoration, and multimodal foundation-model benchmarks.</p>
         </div>
         <div class="feature-grid">
           <article class="feature">
@@ -1035,7 +1175,7 @@ bash offline_demo/run_offline.sh</code></pre>
             <p>Annotators can switch between boxes, oriented boxes, polygons, and QA review. Dataset builders can organize image sources, model backends, metadata, and export formats without gluing multiple tools together.</p>
           </div>
           <div class="check-list">
-            <div class="check">Server-folder import indexes large UAV datasets without copying original image collections.</div>
+            <div class="check">Server-folder import indexes large image collections without copying original data.</div>
             <div class="check">Readable JSON remains the source of truth, with SQLite side indexes for filtering and status summaries.</div>
             <div class="check">Sample data is bundled, so a new user can clone the repository and run a local demo immediately.</div>
           </div>
@@ -1069,24 +1209,49 @@ bash offline_demo/run_offline.sh</code></pre>
     <section id="workflow">
       <div class="shell">
         <div class="section-head">
-          <h2>Built around the actual dataset production loop.</h2>
-          <p>Import data, run model assistance, correct annotations, review QA, export training files, and generate release-ready dataset assets.</p>
+          <h2>Dataset Production Flow</h2>
+          <p>A complete loop from raw imagery and metadata to model assistance, human review, quality control, benchmark export, and dataset release assets.</p>
         </div>
-        <div class="workflow-grid">
-          <article class="step">
-            <div class="step-number">01</div>
-            <h3>Index data</h3>
-            <p>Import server folders or local files while keeping paths, scenes, weather, altitude, and task metadata attached.</p>
+        <div class="flow-board">
+          <article class="flow-step">
+            <small>01</small>
+            <strong>Raw Imagery</strong>
+            <span>Server folders, browser uploads, flight batches, and paired image assets.</span>
           </article>
-          <article class="step">
-            <div class="step-number">02</div>
-            <h3>Pre-annotate</h3>
-            <p>Use YOLO, SegEarth, SAM-style services, OCR/VLM backends, or custom HTTP predictors to create candidates.</p>
+          <article class="flow-step">
+            <small>02</small>
+            <strong>Metadata Indexing</strong>
+            <span>Altitude, GPS, weather, scene, source, task type, timestamp, and review status.</span>
           </article>
-          <article class="step">
-            <div class="step-number">03</div>
-            <h3>Review and export</h3>
-            <p>Human reviewers correct results, audit QA answers, and export benchmark-ready files for training and release.</p>
+          <article class="flow-step">
+            <small>03</small>
+            <strong>Pre-annotation</strong>
+            <span>YOLO, SegEarth, SAM-style prompts, OCR/VLM backends, and custom HTTP predictors.</span>
+          </article>
+          <article class="flow-step">
+            <small>04</small>
+            <strong>Human Review</strong>
+            <span>Detection boxes, oriented boxes, polygons, masks, QA answers, and paired-image checks.</span>
+          </article>
+          <article class="flow-step">
+            <small>05</small>
+            <strong>Event QA</strong>
+            <span>Question options, model answers, ground truth, image evidence, and reasoning traces.</span>
+          </article>
+          <article class="flow-step">
+            <small>06</small>
+            <strong>Quality Control</strong>
+            <span>Low-confidence flags, missing metadata checks, status summaries, and conflict review.</span>
+          </article>
+          <article class="flow-step">
+            <small>07</small>
+            <strong>Benchmark Export</strong>
+            <span>COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, Mask PNG, and QA JSONL.</span>
+          </article>
+          <article class="flow-step">
+            <small>08</small>
+            <strong>Dataset Release</strong>
+            <span>Dataset Card, README assets, release notes, and paper-ready workflow summaries.</span>
           </article>
         </div>
       </div>
@@ -1096,7 +1261,7 @@ bash offline_demo/run_offline.sh</code></pre>
       <div class="shell">
         <div class="section-head">
           <h2>Example Projects</h2>
-          <p>UAIV-Labeler is aimed at real low-altitude remote-sensing use cases, where a dataset may combine object detection, event labels, QA, OCR, and restoration evidence.</p>
+          <p>UAIV-Labeler is aimed at real remote-sensing use cases, where a dataset may combine object detection, event labels, QA, OCR, and restoration evidence.</p>
         </div>
         <div class="project-grid">
           <article class="project">
@@ -1122,11 +1287,11 @@ bash offline_demo/run_offline.sh</code></pre>
           <article class="project">
             <small>Agriculture</small>
             <strong>Farmland and wetland monitoring</strong>
-            <span>Track land-cover areas, field boundaries, vegetation state, and UAV acquisition conditions.</span>
+            <span>Track land-cover areas, field boundaries, vegetation state, and acquisition conditions.</span>
           </article>
           <article class="project">
             <small>Multimodal QA</small>
-            <strong>UAV-VQA and benchmark review</strong>
+            <strong>Aerial VQA and benchmark review</strong>
             <span>Inspect image-grounded questions, candidate answers, model traces, and benchmark export files.</span>
           </article>
         </div>
@@ -1155,6 +1320,31 @@ bash offline_demo/run_offline.sh</code></pre>
           <article class="arch-node">
             <strong>Export Engine</strong>
             <p>COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, masks, QA JSONL, and Dataset Card assets.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Publications</h2>
+          <p>Reserved for upcoming dataset papers, benchmark reports, and system descriptions connected to the UAIV ecosystem.</p>
+        </div>
+        <div class="publication-list">
+          <article class="publication">
+            <small>Coming Soon</small>
+            <div>
+              <strong>UAIV dataset release paper</strong>
+              <span>Low-altitude multimodal dataset documentation, benchmark protocol, and data release assets.</span>
+            </div>
+          </article>
+          <article class="publication">
+            <small>Coming Soon</small>
+            <div>
+              <strong>UAIV-Labeler system overview</strong>
+              <span>Metadata-first, model-assisted annotation workflow for aerial observation data construction.</span>
+            </div>
           </article>
         </div>
       </div>
@@ -1197,25 +1387,53 @@ http://127.0.0.1:7860</code></pre>
       </div>
     </section>
 
-    <section>
-      <div class="shell two-col">
-        <figure class="screen">
-          <img src="site-assets/metadata.png" alt="UAIV-Labeler metadata-first management screenshot">
-          <figcaption class="screen-caption">
-            <span>Metadata-first Data Management</span>
-            <span>Scenes / Weather / Altitude / Tasks</span>
-          </figcaption>
-        </figure>
-        <div>
-          <div class="section-head">
-            <h2>Positioned as a UAIV Team open-source platform.</h2>
-          </div>
-          <div class="check-list">
-            <div class="check">The public identity is UAIV, not a personal portfolio page.</div>
-            <div class="check">The platform is designed to support future Scientific Data, benchmark, and foundry-style releases.</div>
-            <div class="check">Roadmap: full offline package, interactive segmentation, large-image tiling, and multi-user audit trails.</div>
-            <div class="check">Community task templates can be added for new UAV and remote-sensing workflows.</div>
-          </div>
+    <section id="roadmap">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Roadmap</h2>
+          <p>The current release already covers core review and export workflows. Next milestones focus on stronger segmentation, larger imagery, collaboration, and dataset release operations.</p>
+        </div>
+        <div class="roadmap-grid">
+          <article class="roadmap-item done">
+            <small>Available</small>
+            <strong>Detection and OBB</strong>
+            <span>Horizontal boxes, oriented boxes, polygons, QA review, and benchmark export are available in the current workflow.</span>
+          </article>
+          <article class="roadmap-item done">
+            <small>Available</small>
+            <strong>Model pre-annotation</strong>
+            <span>YOLO, SegEarth, OCR/VLM, SAM-style services, and custom HTTP backends can be connected.</span>
+          </article>
+          <article class="roadmap-item next">
+            <small>Next</small>
+            <strong>Interactive segmentation</strong>
+            <span>Click and box prompt segmentation with stronger SAM-style review interactions.</span>
+          </article>
+          <article class="roadmap-item next">
+            <small>Next</small>
+            <strong>Large image tiling</strong>
+            <span>Tile-based browsing for large mosaics, wide-area imagery, and GeoTIFF-like data.</span>
+          </article>
+          <article class="roadmap-item next">
+            <small>Next</small>
+            <strong>Multi-user collaboration</strong>
+            <span>Reviewer assignment, audit trails, team status tracking, and database-backed workflows.</span>
+          </article>
+          <article class="roadmap-item next">
+            <small>Next</small>
+            <strong>Dataset release manager</strong>
+            <span>Dataset Card generation, export summaries, release checklists, and paper-ready assets.</span>
+          </article>
+          <article class="roadmap-item">
+            <small>Planned</small>
+            <strong>Full offline package</strong>
+            <span>Self-contained deployments for intranet, no-internet, and secure lab environments.</span>
+          </article>
+          <article class="roadmap-item">
+            <small>Planned</small>
+            <strong>Task template library</strong>
+            <span>Reusable templates for urban governance, ecology, agriculture, emergency response, and restoration tasks.</span>
+          </article>
         </div>
       </div>
     </section>
