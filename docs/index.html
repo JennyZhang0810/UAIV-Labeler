@@ -162,9 +162,14 @@
     h1 {
       margin: 0;
       max-width: 680px;
-      font-size: clamp(48px, 7vw, 84px);
-      line-height: 0.94;
+      font-size: clamp(52px, 6.4vw, 78px);
+      line-height: 0.92;
       letter-spacing: 0;
+    }
+
+    h1 .line {
+      display: block;
+      white-space: nowrap;
     }
 
     .lead {
@@ -979,7 +984,7 @@
     <div class="shell nav-inner">
       <a class="brand" href="#">
         <span class="mark">UA</span>
-        <span>UAIV Dataset Engine</span>
+        <span>UAIV Engine</span>
       </a>
       <div class="nav-links">
         <a href="#tasks">Tasks</a>
@@ -988,7 +993,7 @@
         <a href="#architecture">Architecture</a>
         <a href="#roadmap">Roadmap</a>
         <a href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
-        <a class="button primary" href="http://121.48.163.156:7860">在线演示</a>
+        <a class="button primary" href="http://121.48.163.156:7860">Live Demo</a>
       </div>
     </div>
   </nav>
@@ -998,7 +1003,7 @@
       <div class="shell hero-grid">
         <div>
           <div class="eyebrow"><span class="dot"></span> UAIV-Labeler is the annotation module of the UAIV ecosystem</div>
-          <h1>UAIV Dataset Engine</h1>
+          <h1><span class="line">UAIV</span><span class="line">Dataset Engine</span></h1>
           <p class="lead">
             Build low-altitude remote-sensing datasets beyond boxes. The current open-source module, UAIV-Labeler, combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one workflow.
           </p>
