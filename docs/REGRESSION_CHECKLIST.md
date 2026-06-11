@@ -28,6 +28,8 @@ curl -s -o /tmp/uaiv_home.html -w 'home %{http_code} %{size_download}\n' http://
 curl -s -o /tmp/uaiv_app.js -w 'appjs %{http_code} %{size_download}\n' http://127.0.0.1:7860/static/app.js
 curl -s -o /tmp/uaiv_config.json -w 'config %{http_code} %{size_download}\n' http://127.0.0.1:7860/api/config
 curl -s -o /tmp/uaiv_stats.json -w 'stats %{http_code} %{size_download}\n' http://127.0.0.1:7860/api/stats
+curl -s -o /tmp/uaiv_quality.json -w 'quality %{http_code} %{size_download}\n' http://127.0.0.1:7860/api/quality-report
+curl -s -o /tmp/uaiv_dataset_card.json -w 'dataset_card %{http_code} %{size_download}\n' -X POST http://127.0.0.1:7860/api/dataset-card
 curl -s -o /tmp/uaiv_models.json -w 'models %{http_code} %{size_download}\n' http://127.0.0.1:7860/api/models
 curl -s -o /tmp/uaiv_images.json -w 'images %{http_code} %{size_download}\n' 'http://127.0.0.1:7860/api/images?limit=5'
 ```
@@ -42,6 +44,11 @@ Expected result: all status codes should be `200`.
 - Select an image from the list.
 - Confirm Metadata is shown in the right panel.
 - Draw a bounding box manually.
+- Draw a rotated bounding box and confirm the object row contains a rotation value.
+- Use point-region mode to create a polygon with at least 3 points.
+- Confirm the segment list shows the new region.
+- Enable edit-geometry mode.
+- Drag a box to move it, drag a corner handle to resize it, and drag one polygon vertex.
 - Set or type a custom object label.
 - Press `Ctrl+S`.
 - Confirm a save toast appears and the next image is selected.
@@ -112,4 +119,3 @@ Server Deployment:
 - Update `USER_GUIDE.md` for workflow changes.
 - Update `docs/CUSTOM_MODEL.md` for model API changes.
 - Record the change, verification commands, and known limitations in the project work log.
-

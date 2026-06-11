@@ -17,7 +17,7 @@ UAIV-Labeler is the official annotation platform for UAIV-style datasets. It is 
 
 ## Links
 
-- Live demo: http://121.48.163.156:7860
+- Live demo: http://8.137.184.86
 - GitHub repository: https://github.com/JennyZhang0810/UAIV-Labeler
 - UAIV dataset project: https://jennyzhang0810.github.io/LowAltitude-Multimodal-Dataset/
 
@@ -28,7 +28,7 @@ UAIV-Labeler supports three clearly separated ways to use the platform:
 | Mode | Best For | Data Access | Model Access |
 | --- | --- | --- | --- |
 | **Offline Demo** | Local trial, classroom demo, air-gapped preview | Uses `sample_data/` by default and does not expose a public service | Built-in mock predictions and manual annotation; no heavyweight model weights bundled |
-| **Online Live Demo** | Quick public preview | Opens the hosted demo at `http://121.48.163.156:7860`; it can only read demo/server-side data on that host | Uses the backends configured on the hosted server |
+| **Online Live Demo** | Quick public preview | Opens the hosted demo at `http://8.137.184.86`; it can only read demo/server-side data on that host | Uses the backends configured on the hosted server |
 | **Server Deployment** | Lab/team production annotation | Runs on your own server or mounted storage, so server-folder import can browse your datasets | Connect local GPU models, remote HTTP model services, or custom backends |
 
 The offline demo is intentionally lightweight. It is not the same as the planned full offline package with bundled model environments and weights.
@@ -37,9 +37,12 @@ The offline demo is intentionally lightweight. It is not the same as the planned
 
 - **Low-altitude remote-sensing first**: batch, altitude, GPS, weather, scene, source, and task Metadata are built into the annotation flow.
 - **No large Web upload required**: server-folder import stores image paths and Metadata indexes instead of duplicating massive UAV datasets.
+- **SQLite side index**: portable JSON remains the source of truth, while `data/index.sqlite3` provides a rebuildable index for faster filtering, status summaries, and future team workflows.
 - **Multi-task workflow**: object detection, segmentation, OCR, event QA, restoration-pair annotation, and structure understanding can be reviewed in one workspace.
+- **Manual geometry tools**: supports horizontal boxes, rotated boxes, and point-by-point polygon regions for remote-sensing objects and areas.
 - **Model-assisted annotation**: connect YOLO, SegEarth, SAM-style services, OCR, VLMs, or custom HTTP model backends.
-- **QA and Benchmark ready**: review TSV QA files, inspect XLSX model results, and export JSON, COCO, VOC, or QA JSONL.
+- **QA and Benchmark ready**: review TSV QA files, inspect XLSX model results, and export JSON, COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, Mask PNG, or QA JSONL.
+- **Quality control utilities**: generate a metadata/path confidence report and a Markdown Dataset Card for release notes, dataset papers, and project pages.
 - **GitHub-friendly demo data**: includes a tiny runnable sample dataset so users can try the platform immediately.
 - **Offline-friendly entry point**: includes a local-only demo for manual annotation and workflow review without exposing a public server.
 
@@ -126,6 +129,8 @@ Contact:
 
 ### Offline Demo
 
+The offline demo is a complete local-only workflow: start locally, import sample data, annotate manually, save, and export. It is intentionally separated from the online demo and server deployment.
+
 ```bash
 git clone https://github.com/JennyZhang0810/UAIV-Labeler.git
 cd UAIV-Labeler
@@ -146,6 +151,16 @@ sample_data/images
 sample_data/qa/sample_qa.tsv
 ```
 
+Offline manual tools include horizontal boxes, rotated boxes, and point-by-point polygon regions.
+
+Maintainers can package the lightweight offline demo for release:
+
+```bash
+bash scripts/build_offline_bundle.sh
+```
+
+This creates `dist/uaiv-labeler-offline-demo-<version>.tar.gz` and excludes logs, private uploads, generated exports, rebuildable SQLite indexes, and model weights.
+
 Windows users can run:
 
 ```text
@@ -159,7 +174,7 @@ The offline demo binds to `127.0.0.1` and is visible only on the current compute
 Open the public preview:
 
 ```text
-http://121.48.163.156:7860
+http://8.137.184.86
 ```
 
 This address is for previewing the hosted service. It cannot browse a visitor's private C/D/F drive or another team's server disks.

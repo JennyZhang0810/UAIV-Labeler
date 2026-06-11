@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+import json
 import logging
 import time
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path, PureWindowsPath
 import re
+from typing import Any
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from flask import Flask, g, jsonify, request, send_file, send_from_directory
@@ -15,7 +17,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 
 from annotation_store import AnnotationStore, IMAGE_EXTENSIONS
-from model_registry import list_models, run_custom_remote_model, run_model
+from model_registry import list_models, run_custom_remote_model, run_model, run_sam_prompt
 from qa_tools import result_item, result_meta, tsv_item, tsv_meta, write_clean_row
 from schemas import (
     EVENT_LABELS,
@@ -25,6 +27,7 @@ from schemas import (
     SEGMENT_LABELS,
     TASK_NAMES,
     TASKS,
+    URBAN_STRUCTURE_LABELS,
     WEATHER_LABELS,
 )
 from storage_resolver import StorageResolver
@@ -108,6 +111,7 @@ def config():
             "tasks": TASKS,
             "task_names": TASK_NAMES,
             "scene_labels": SCENE_LABELS,
+            "urban_structure_labels": URBAN_STRUCTURE_LABELS,
             "object_labels": OBJECT_LABELS,
             "segment_labels": SEGMENT_LABELS,
             "event_labels": EVENT_LABELS,
@@ -221,11 +225,16 @@ def qa_upload_images():
 
 @app.get("/api/images")
 def images():
-    filters = {
+    return jsonify(store.list_images(_image_filters_from_request()))
+
+
+def _image_filters_from_request() -> dict[str, str]:
+    return {
         "task": request.args.get("task", ""),
         "scene": request.args.get("scene", ""),
         "weather": request.args.get("weather", ""),
         "batch": request.args.get("batch", ""),
+        "annotator_group": request.args.get("annotator_group", ""),
         "source_type": request.args.get("source_type", ""),
         "min_altitude": request.args.get("min_altitude", ""),
         "max_altitude": request.args.get("max_altitude", ""),
@@ -234,7 +243,29 @@ def images():
         "min_latitude": request.args.get("min_latitude", ""),
         "max_latitude": request.args.get("max_latitude", ""),
     }
-    return jsonify(store.list_images(filters))
+
+
+@app.post("/api/reset-dataset")
+def reset_dataset():
+    store.reset_dataset()
+    logger.info("dataset_reset")
+    return jsonify({"ok": True, "total": 0})
+
+
+@app.post("/api/prefill/rules")
+def prefill_rules():
+    payload = request.get_json(silent=True) or {}
+    dry_run = bool(payload.get("dry_run", True))
+    result = store.backfill_rule_prefill(dry_run=dry_run)
+    logger.info(
+        "rule_prefill_backfill dry_run=%s would_update=%s updated=%s skipped_human=%s skipped_prefill=%s",
+        dry_run,
+        result.get("would_update"),
+        result.get("updated"),
+        result.get("skipped_human"),
+        result.get("skipped_prefill"),
+    )
+    return jsonify(result)
 
 
 @app.get("/api/images/<image_id>")
@@ -303,6 +334,92 @@ def predict_with_model(image_id: str, model_id: str):
         raise BadRequest(str(exc)) from exc
 
 
+@app.post("/api/predict-model-batch/<model_id>")
+def predict_batch_with_model(model_id: str):
+    started = time.perf_counter()
+    payload = request.get_json(silent=True) or {}
+    dry_run = bool(payload.get("dry_run", True))
+    include_stages = {str(item) for item in payload.get("include_stages", []) if str(item)}
+    filters = payload.get("filters") or {}
+    limit = int(payload.get("limit") or 50)
+    candidates = store.batch_prediction_candidates(filters, include_stages=include_stages or None, limit=limit)
+    result = {
+        "dry_run": dry_run,
+        "model_id": model_id,
+        **candidates,
+        "updated": 0,
+        "failed": 0,
+        "failures": [],
+    }
+    if dry_run:
+        logger.info("batch_model_preview model_id=%s matched=%s candidates=%s", model_id, candidates.get("matched"), candidates.get("candidate_count"))
+        _write_batch_model_run(model_id, payload, result)
+        return jsonify(result)
+
+    for item in candidates["candidates"]:
+        image_id = item["image_id"]
+        try:
+            metadata = store.get_metadata(image_id)
+            annotation = store.get_annotation(image_id)
+            prediction = run_model(model_id, metadata, annotation)
+            store.save_annotation(image_id, prediction, action=f"prediction_batch_{model_id}")
+            result["updated"] += 1
+        except (RuntimeError, ValueError, FileNotFoundError, KeyError) as exc:
+            result["failed"] += 1
+            if len(result["failures"]) < 20:
+                result["failures"].append({"image_id": image_id, "error": str(exc)})
+    logger.info(
+        "batch_model_prediction model_id=%s dry_run=%s matched=%s candidates=%s updated=%s failed=%s elapsed_ms=%.1f",
+        model_id,
+        dry_run,
+        result.get("matched"),
+        result.get("candidate_count"),
+        result.get("updated"),
+        result.get("failed"),
+        (time.perf_counter() - started) * 1000,
+    )
+    _write_batch_model_run(model_id, payload, result)
+    return jsonify(result)
+
+
+def _write_batch_model_run(model_id: str, payload: dict[str, Any], result: dict[str, Any]) -> None:
+    log_dir = ROOT / "data" / "batch_model_runs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    record = {
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        "model_id": model_id,
+        "request": payload,
+        "result": result,
+    }
+    (log_dir / f"{timestamp}_{model_id}.json").write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+@app.get("/api/batch-model-runs")
+def batch_model_runs():
+    log_dir = ROOT / "data" / "batch_model_runs"
+    runs = []
+    for path in sorted(log_dir.glob("*.json"), reverse=True)[:50] if log_dir.exists() else []:
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        result = record.get("result", {})
+        runs.append(
+            {
+                "file": path.name,
+                "created_at": record.get("created_at", ""),
+                "model_id": record.get("model_id", ""),
+                "dry_run": result.get("dry_run", True),
+                "matched": result.get("matched", 0),
+                "candidate_count": result.get("candidate_count", 0),
+                "updated": result.get("updated", 0),
+                "failed": result.get("failed", 0),
+            }
+        )
+    return jsonify({"runs": runs})
+
+
 @app.post("/api/images/<image_id>/predict-custom")
 def predict_with_custom_model(image_id: str):
     started = time.perf_counter()
@@ -325,6 +442,34 @@ def predict_with_custom_model(image_id: str):
         raise NotFound(f"Image not found: {image_id}") from exc
     except (RuntimeError, ValueError, FileNotFoundError) as exc:
         logger.exception("custom_prediction_failed image_id=%s elapsed_ms=%.1f", image_id, (time.perf_counter() - started) * 1000)
+        raise BadRequest(str(exc)) from exc
+
+
+@app.post("/api/images/<image_id>/segment-prompt")
+def segment_with_prompt(image_id: str):
+    payload = request.get_json(force=True)
+    points = payload.get("points", [])
+    label = str(payload.get("label") or "region")
+    if not isinstance(points, list) or not points:
+        raise BadRequest("At least one prompt point is required.")
+    started = time.perf_counter()
+    try:
+        metadata = store.get_metadata(image_id)
+        annotation = store.get_annotation(image_id)
+        prediction = run_sam_prompt(metadata, annotation, points, label)
+        result = store.save_annotation(image_id, prediction, action="prediction_sam_prompt")
+        logger.info(
+            "sam_prompt image_id=%s points=%s elapsed_ms=%.1f segments=%s",
+            image_id,
+            len(points),
+            (time.perf_counter() - started) * 1000,
+            len(result.get("segments", [])),
+        )
+        return jsonify(result)
+    except KeyError as exc:
+        raise NotFound(f"Image not found: {image_id}") from exc
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        logger.exception("sam_prompt_failed image_id=%s elapsed_ms=%.1f", image_id, (time.perf_counter() - started) * 1000)
         raise BadRequest(str(exc)) from exc
 
 
@@ -392,6 +537,59 @@ def upload_folder():
 @app.get("/api/stats")
 def stats():
     return jsonify(store.stats())
+
+
+@app.get("/api/quality-report")
+def quality_report():
+    return jsonify(store.quality_report())
+
+
+@app.get("/api/risk-queue")
+def risk_queue():
+    limit = int(request.args.get("limit", "100") or 100)
+    risk_types = _risk_types_from_request()
+    return jsonify(store.risk_queue(_image_filters_from_request(), limit=limit, risk_types=risk_types))
+
+
+@app.get("/api/review-sampling/export")
+def review_sampling_export():
+    sample_rate = float(request.args.get("sample_rate", "0.1") or 0.1)
+    min_per_group = int(request.args.get("min_per_group", "1") or 1)
+    risk_required = request.args.get("risk_required", "1").lower() in {"1", "true", "yes", "on"}
+    seed = request.args.get("seed", "uaiv-formal-annotation")
+    result = store.export_review_sampling_queue(
+        _image_filters_from_request(),
+        sample_rate=sample_rate,
+        min_per_group=min_per_group,
+        risk_required=risk_required,
+        seed=seed,
+    )
+    logger.info(
+        "review_sampling_export matched=%s selected=%s csv=%s",
+        result.get("matched"),
+        result.get("selected"),
+        result.get("csv_path"),
+    )
+    return jsonify(result)
+
+
+@app.post("/api/dataset-card")
+def dataset_card():
+    result = store.write_dataset_card()
+    logger.info("dataset_card_generated path=%s", result.get("path"))
+    return jsonify(result)
+
+
+@app.get("/api/index/status")
+def index_status():
+    return jsonify(store.index_status())
+
+
+@app.post("/api/index/rebuild")
+def index_rebuild():
+    result = store.rebuild_index()
+    logger.info("index_rebuilt indexed_images=%s path=%s", result.get("indexed_images"), result.get("path"))
+    return jsonify(result)
 
 
 @app.get("/api/qa/tsv/meta")
@@ -480,6 +678,12 @@ def _candidate_image_names(value: str) -> list[str]:
         if name and name not in names:
             names.append(name)
     return names
+
+
+def _risk_types_from_request() -> set[str]:
+    values = request.args.getlist("risk_type")
+    combined = ",".join(values)
+    return {item.strip() for item in combined.split(",") if item.strip()}
 
 
 @app.post("/api/export/<fmt>")

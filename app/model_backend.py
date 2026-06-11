@@ -13,23 +13,57 @@ def _rng(image_id: str) -> random.Random:
 
 
 def blank_annotation(metadata: dict[str, Any]) -> dict[str, Any]:
+    tasks = set(metadata.get("tasks") or [])
+    scene_label = metadata.get("scene", "") if "scene_classification" in tasks else ""
+    weather_label = metadata.get("weather", "") if "environment_state" in tasks else ""
+    event_label = metadata.get("event_label", "") if {"event_qa", "event_understanding"} & tasks else ""
+    urban_label = metadata.get("urban_structure_label", "") if "urban_structure" in tasks else ""
+    scene_combination = metadata.get("scene_combination_label", "") if "scene_classification" in tasks else ""
+    urban_combination = metadata.get("urban_combination_label", "") if "urban_structure" in tasks else ""
+    scene_secondary = _split_prefill_labels(scene_combination)
+    urban_secondary = _split_prefill_labels(urban_combination)
     return {
         "image_id": metadata["id"],
         "review_status": "unlabeled",
-        "scene": {"label": metadata.get("scene", ""), "score": None, "status": "empty"},
-        "environment": {"label": metadata.get("weather", ""), "score": None, "status": "empty"},
+        "prefill_source": "metadata_rules",
+        "scene": {
+            "label": scene_label,
+            "combination_label": scene_combination,
+            "secondary_labels": scene_secondary,
+            "score": None,
+            "status": "rule_prefill" if scene_label or scene_combination else "empty",
+        },
+        "environment": {"label": weather_label, "score": None, "status": "rule_prefill" if weather_label else "empty"},
         "objects": [],
         "segments": [],
         "ocr": [],
-        "events": [],
+        "events": [
+            {
+                "label": event_label,
+                "question": "",
+                "answer": "",
+                "score": None,
+                "status": "rule_prefill",
+            }
+        ] if event_label else [],
         "restoration": {
             "degradation": "",
             "clear_pair_id": metadata.get("clear_pair_id", ""),
             "quality": "",
             "status": "empty",
         },
-        "urban_structure": {"summary": "", "status": "empty"},
+        "urban_structure": {
+            "label": urban_label,
+            "summary": urban_label,
+            "combination_label": urban_combination,
+            "secondary_labels": urban_secondary,
+            "status": "rule_prefill" if urban_label or urban_combination else "empty",
+        },
     }
+
+
+def _split_prefill_labels(value: Any) -> list[str]:
+    return [item.strip() for item in str(value or "").replace("，", "+").replace(",", "+").replace(";", "+").replace("；", "+").split("+") if item.strip()]
 
 
 def predict(metadata: dict[str, Any]) -> dict[str, Any]:

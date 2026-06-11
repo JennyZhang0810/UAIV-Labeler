@@ -7,7 +7,7 @@ UAIV-Labeler separates three usage modes:
 | Mode | Entry | Use Case |
 | --- | --- | --- |
 | Offline Demo | `offline_demo/run_offline.sh` or `.bat` | Local-only trial with `sample_data/`, manual annotation, and mock predictions |
-| Online Live Demo | `http://121.48.163.156:7860` | Public preview of the hosted platform |
+| Online Live Demo | `http://8.137.184.86` | Public preview of the hosted platform |
 | Server Deployment | `scripts/start_public.sh`, Docker, or Gunicorn/Nginx | Team/lab use with mounted datasets and real model services |
 
 Use the offline demo when you only want to try the workflow on the current computer. Use server deployment when the platform must browse a lab data disk or connect GPU model environments.
@@ -47,7 +47,7 @@ This is useful for development. For a shareable server address, bind to `0.0.0.0
 Current public demo:
 
 ```text
-http://121.48.163.156:7860
+http://8.137.184.86
 ```
 
 ```bash

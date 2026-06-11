@@ -99,6 +99,61 @@ def run_custom_remote_model(config: dict[str, Any], metadata: dict[str, Any], an
     return updated
 
 
+def run_sam_prompt(metadata: dict[str, Any], annotation: dict[str, Any], points: list[dict[str, Any]], label: str) -> dict[str, Any]:
+    config = _load_config().get("models", {}).get("sam3", {})
+    if not config.get("enabled", False):
+        raise RuntimeError("SAM interactive backend is not enabled. Configure config/model_backends.json or use a custom remote segmentation service.")
+    if config.get("mode") != "remote":
+        raise RuntimeError("Local SAM runner is not enabled in the Web service. Set the SAM backend to mode=remote and run SAM/SAM2/SAM3 as a separate HTTP service.")
+    url = str(config.get("url", "")).strip()
+    if not url:
+        raise RuntimeError("SAM remote service URL is missing.")
+
+    image_path = resolve_image_path(metadata)
+    payload = {
+        "model_name": config.get("name") or "sam_interactive",
+        "task": "instance_segmentation",
+        "image_id": metadata["id"],
+        "image_path": str(image_path),
+        "metadata": metadata,
+        "annotation": annotation,
+        "prompts": {
+            "points": points,
+            "label": label or "region",
+        },
+    }
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=int(config.get("timeout", 240))) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"SAM service HTTP {exc.code}: {detail}") from exc
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"Cannot connect SAM service: {exc.reason}") from exc
+
+    new_segments = result.get("segments", [])
+    if not isinstance(new_segments, list):
+        raise RuntimeError("SAM service response must contain a list field named 'segments'.")
+    updated = {**annotation}
+    updated["image_id"] = metadata["id"]
+    updated["segments"] = list(updated.get("segments", [])) + new_segments
+    updated["review_status"] = "predicted"
+    updated["model_predictions"] = updated.get("model_predictions", {})
+    updated["model_predictions"]["sam_interactive"] = {
+        "name": payload["model_name"],
+        "prompt_points": len(points),
+        "segment_count": len(new_segments),
+        "url": url,
+    }
+    return updated
+
+
 def check_model_health(model_id: str, config: dict[str, Any]) -> dict[str, Any]:
     messages = []
     if not config.get("enabled", False):

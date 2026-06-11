@@ -23,16 +23,48 @@ TASK_NAMES = {
 }
 
 SCENE_LABELS = [
+    "commercial_district",
+    "construction_site",
+    "farmland",
+    "industrial_area",
+    "mixed",
+    "natural_vegetation",
+    "residential_area",
+    "river",
+    "school",
+    "thoroughfare",
     "工地",
     "工业园区",
     "交通要道",
     "居住区",
     "商业区",
+    "农林园田",
     "学校区",
+]
+
+URBAN_STRUCTURE_LABELS = [
+    "commercial_service_area",
+    "construction_site",
+    "cultivated_land",
+    "educational_facility",
+    "healthcare_facility",
+    "industrial_park",
+    "natural_idle_land",
+    "parking_facility",
+    "residential_area",
+    "sports_activity_ground",
+    "urban_road_infrastructure",
+    "water_bodies_hydraulic_infrastructure",
+    "铁路",
+    "湿地公园",
+    "公墓",
+    "市场",
     "菜市场",
     "加油站",
-    "酒店",
     "通信/电力塔",
+    "酒店",
+    "学校",
+    "医院",
     "林地",
     "农田",
     "湖面",
@@ -40,31 +72,48 @@ SCENE_LABELS = [
 ]
 
 OBJECT_LABELS = [
+    "boat",
+    "car",
+    "distribution_facility",
+    "distribution_dominance",
+    "excavator",
+    "fireworks",
+    "garbage",
+    "non_motor_vehicle",
+    "pedestrian",
+    "residential_building",
+    "sports_court",
+    "tower_crane",
+    "vendor",
     "ship",
     "vehicle",
-    "non_motor_vehicle",
-    "vendor",
     "person",
     "crane",
     "truck",
-    "excavator",
     "building",
     "tower",
     "smoke",
     "fire",
-    "garbage",
     "illegal_parking",
 ]
 
 SEGMENT_LABELS = ["道路", "河道", "农林园田", "湿地公园", "建筑物", "水体"]
 
 EVENT_LABELS = [
+    "不受控燃烧",
+    "水污染",
+    "人群聚集",
+    "挖机作业",
+    "烟花燃放",
+    "垃圾堆放",
+    "公园活动",
+    "体育活动",
+    "占道经营",
+    "违章建筑",
+    "车辆运输",
     "河道排污",
     "燃烧",
-    "挖机作业",
-    "垃圾堆放",
     "庆典集会",
-    "人群聚集",
     "操场运动",
     "交通拥堵",
     "违章停车",
@@ -73,6 +122,6 @@ EVENT_LABELS = [
     "河道/湖泊污染",
 ]
 
-WEATHER_LABELS = ["晴", "雨", "雾", "夜间", "红外"]
+WEATHER_LABELS = ["晴", "雨", "雾", "夜间", "红外", "sunny", "rainy", "night"]
 
 RESTORATION_TYPES = ["雨", "雾", "红外", "低照度", "模糊"]

@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import threading
-from collections import Counter
+import csv
+import random
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from PIL import ExifTags, Image
+from PIL import ExifTags, Image, ImageDraw
 
+from data_index import DataIndex
 from model_backend import blank_annotation, predict
 
 
@@ -32,9 +36,11 @@ class AnnotationStore:
         self.data_dir = root / "data"
         self.exports_dir = root / "exports"
         self.history_dir = self.data_dir / "history"
+        self.index_path = self.data_dir / "index.sqlite3"
         self.metadata_path = self.data_dir / "metadata.json"
         self.annotations_path = self.data_dir / "annotations.json"
         self._lock = threading.RLock()
+        self.index = DataIndex(self.index_path)
         self.exports_dir.mkdir(parents=True, exist_ok=True)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.history_dir.mkdir(parents=True, exist_ok=True)
@@ -44,6 +50,7 @@ class AnnotationStore:
             self._write_json(self.metadata_path, [])
         self._metadata_cache = self._read_json(self.metadata_path, [])
         self._annotations_cache = self._read_json(self.annotations_path, {})
+        self.rebuild_index()
 
     def _read_json(self, path: Path, default: Any) -> Any:
         if not path.exists():
@@ -89,6 +96,8 @@ class AnnotationStore:
                     continue
                 if filters.get("batch") and filters["batch"] != item.get("batch"):
                     continue
+                if filters.get("annotator_group") and filters["annotator_group"] != item.get("annotator_group"):
+                    continue
                 source_type = _source_type(item)
                 if filters.get("source_type") and filters["source_type"] != source_type:
                     continue
@@ -112,6 +121,7 @@ class AnnotationStore:
                         "id": item["id"],
                         "file_name": item.get("file_name", ""),
                         "batch": item.get("batch", ""),
+                        "annotator_group": item.get("annotator_group", ""),
                         "weather": item.get("weather", ""),
                         "scene": item.get("scene", ""),
                         "tasks": item.get("tasks", []),
@@ -150,6 +160,7 @@ class AnnotationStore:
             self._write_history_snapshot(image_id, action, payload)
             self._annotations_cache[image_id] = payload
             self._write_json(self.annotations_path, self._annotations_cache)
+            self.rebuild_index()
             return payload
 
     def rerun_prediction(self, image_id: str) -> dict[str, Any]:
@@ -162,6 +173,7 @@ class AnnotationStore:
             self._write_history_snapshot(image_id, "prediction", prediction)
             self._annotations_cache[image_id] = prediction
             self._write_json(self.annotations_path, self._annotations_cache)
+            self.rebuild_index()
             return prediction
 
     def import_records(self, records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -172,6 +184,7 @@ class AnnotationStore:
             merged = list(current.values())
             self._metadata_cache = merged
             self._write_json(self.metadata_path, merged)
+            self.rebuild_index()
             return {"total": len(merged), "imported": len(records)}
 
     def reset_dataset(self) -> None:
@@ -187,6 +200,334 @@ class AnnotationStore:
             self._annotations_cache = {}
             self._write_json(self.metadata_path, self._metadata_cache)
             self._write_json(self.annotations_path, self._annotations_cache)
+            self.rebuild_index()
+
+    def backfill_rule_prefill(self, dry_run: bool = True) -> dict[str, Any]:
+        with self._lock:
+            created = 0
+            replaced_empty = 0
+            skipped_existing = 0
+            skipped_human = 0
+            skipped_prefill = 0
+            skipped_no_rule = 0
+            examples: list[dict[str, str]] = []
+            updates: dict[str, dict[str, Any]] = {}
+
+            for metadata in self._metadata_cache:
+                image_id = metadata["id"]
+                current = self._annotations_cache.get(image_id)
+                stage = _annotation_stage(current)
+                if stage == "no_annotation":
+                    candidate = blank_annotation(metadata)
+                    if not _annotation_source_counts(candidate).get("rule_prefill"):
+                        skipped_no_rule += 1
+                        continue
+                    updates[image_id] = candidate
+                    created += 1
+                elif stage == "empty_annotation" and normalize_review_status(current.get("review_status")) == "unlabeled":
+                    candidate = blank_annotation(metadata)
+                    if not _annotation_source_counts(candidate).get("rule_prefill"):
+                        skipped_no_rule += 1
+                        continue
+                    updates[image_id] = candidate
+                    replaced_empty += 1
+                elif stage in {"human_labeled", "verified", "rejected"}:
+                    skipped_human += 1
+                    continue
+                elif stage in {"imported_prefill", "model_prefill", "rule_prefill"}:
+                    skipped_prefill += 1
+                    continue
+                else:
+                    skipped_existing += 1
+                    continue
+                if len(examples) < 20:
+                    examples.append({"image_id": image_id, "relative_path": str(metadata.get("relative_path") or metadata.get("file_name") or "")})
+
+            if not dry_run and updates:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_dir = self.data_dir / "backups" / f"{timestamp}_rule_prefill_backfill"
+                backup_dir.mkdir(parents=True, exist_ok=True)
+                if self.annotations_path.exists():
+                    (backup_dir / self.annotations_path.name).write_text(self.annotations_path.read_text(encoding="utf-8"), encoding="utf-8")
+                now = datetime.utcnow().isoformat() + "Z"
+                for image_id, annotation in updates.items():
+                    existing = self._annotations_cache.get(image_id)
+                    annotation["created_at"] = existing.get("created_at", now) if isinstance(existing, dict) else now
+                    annotation["updated_at"] = now
+                    self._annotations_cache[image_id] = annotation
+                self._write_json(self.annotations_path, self._annotations_cache)
+                self.rebuild_index()
+
+            return {
+                "dry_run": dry_run,
+                "created": created,
+                "replaced_empty": replaced_empty,
+                "skipped_existing": skipped_existing,
+                "skipped_human": skipped_human,
+                "skipped_prefill": skipped_prefill,
+                "skipped_no_rule": skipped_no_rule,
+                "would_update": len(updates),
+                "updated": 0 if dry_run else len(updates),
+                "examples": examples,
+            }
+
+    def batch_prediction_candidates(
+        self,
+        filters: dict[str, Any],
+        include_stages: set[str] | None = None,
+        limit: int = 100,
+    ) -> dict[str, Any]:
+        include_stages = include_stages or {"no_annotation", "empty_annotation", "rule_prefill"}
+        limit = max(1, min(int(limit or 100), 1000))
+        with self._lock:
+            metadata_by_id = {item["id"]: item for item in self._metadata_cache}
+            rows = self.list_images(filters)
+            candidates = []
+            stage_counter = Counter()
+            skipped_stage = Counter()
+            for row in rows:
+                image_id = row["id"]
+                ann = self._annotations_cache.get(image_id)
+                stage = _annotation_stage(ann)
+                stage_counter.update([stage])
+                if stage not in include_stages:
+                    skipped_stage.update([stage])
+                    continue
+                if len(candidates) >= limit:
+                    continue
+                metadata = metadata_by_id.get(image_id)
+                if metadata:
+                    candidates.append({"image_id": image_id, "relative_path": str(metadata.get("relative_path") or metadata.get("file_name") or ""), "stage": stage})
+            return {
+                "matched": len(rows),
+                "limit": limit,
+                "candidate_count": len(candidates),
+                "stage_counts": dict(stage_counter),
+                "skipped_stage_counts": dict(skipped_stage),
+                "candidates": candidates,
+            }
+
+    def rebuild_index(self) -> dict[str, Any]:
+        return self.index.rebuild(self._metadata_cache, self._annotations_cache)
+
+    def index_status(self) -> dict[str, Any]:
+        return self.index.status()
+
+    def quality_report(self) -> dict[str, Any]:
+        with self._lock:
+            required_fields = ["batch", "scene", "weather", "flight_height_m", "longitude", "latitude"]
+            missing_fields: dict[str, int] = {field: 0 for field in required_fields}
+            broken_paths = []
+            no_task = []
+            low_confidence = []
+            for item in self._metadata_cache:
+                for field in required_fields:
+                    if item.get(field) in (None, ""):
+                        missing_fields[field] += 1
+                if not item.get("tasks"):
+                    no_task.append(item.get("id", ""))
+                image_path = item.get("image_path")
+                if image_path and not Path(str(image_path)).exists():
+                    broken_paths.append({"id": item.get("id", ""), "path": image_path})
+                ann = self._annotations_cache.get(item.get("id", ""), {})
+                for obj in ann.get("objects", []):
+                    try:
+                        score = float(obj.get("score"))
+                    except (TypeError, ValueError):
+                        continue
+                    if score < 0.5:
+                        low_confidence.append(
+                            {
+                                "image_id": item.get("id", ""),
+                                "label": obj.get("label", "object"),
+                                "score": score,
+                            }
+                        )
+            stats = self.stats()
+            return {
+                "generated_at": datetime.utcnow().isoformat() + "Z",
+                "total_images": len(self._metadata_cache),
+                "missing_metadata_fields": missing_fields,
+                "broken_image_paths": broken_paths[:200],
+                "broken_image_path_count": len(broken_paths),
+                "images_without_tasks": no_task[:200],
+                "images_without_task_count": len(no_task),
+                "low_confidence_objects": low_confidence[:200],
+                "low_confidence_object_count": len(low_confidence),
+                "review_status_counts": stats.get("review_status_counts", {}),
+                "lead_time": stats.get("lead_time", {}),
+                "index": stats.get("index", {}),
+            }
+
+    def risk_queue(self, filters: dict[str, Any] | None = None, limit: int = 100, risk_types: set[str] | None = None) -> dict[str, Any]:
+        filters = filters or {}
+        risk_types = {str(item).strip() for item in (risk_types or set()) if str(item).strip()}
+        limit = max(1, min(int(limit or 100), 500))
+        with self._lock:
+            rows = self.list_images(filters)
+            metadata_by_id = {item["id"]: item for item in self._metadata_cache}
+            risk_counts = Counter()
+            items = []
+            for row in rows:
+                image_id = row["id"]
+                metadata = metadata_by_id.get(image_id, row)
+                ann = self._annotations_cache.get(image_id, {})
+                risks = _annotation_risks(metadata, ann)
+                if not risks:
+                    continue
+                if risk_types and not (set(risks) & risk_types):
+                    continue
+                risk_counts.update(risks)
+                items.append(
+                    {
+                        "image_id": image_id,
+                        "relative_path": str(metadata.get("relative_path") or metadata.get("file_name") or ""),
+                        "annotator_group": metadata.get("annotator_group", ""),
+                        "tasks": metadata.get("tasks", []),
+                        "stage": _annotation_stage(ann),
+                        "risks": risks,
+                        "risk_count": len(risks),
+                    }
+                )
+            items.sort(key=lambda item: (-item["risk_count"], item["annotator_group"], item["relative_path"]))
+            return {
+                "matched": len(rows),
+                "risk_image_count": len(items),
+                "risk_counts": dict(risk_counts),
+                "items": items[:limit],
+                "limit": limit,
+                "risk_types": sorted(risk_types),
+            }
+
+    def export_review_sampling_queue(
+        self,
+        filters: dict[str, Any] | None = None,
+        sample_rate: float = 0.1,
+        min_per_group: int = 1,
+        risk_required: bool = True,
+        seed: str = "uaiv-formal-annotation",
+    ) -> dict[str, Any]:
+        filters = filters or {}
+        sample_rate = max(0.0, min(float(sample_rate or 0.1), 1.0))
+        min_per_group = max(0, int(min_per_group or 0))
+        rng = random.Random(str(seed))
+        with self._lock:
+            rows = self.list_images(filters)
+            metadata_by_id = {item["id"]: item for item in self._metadata_cache}
+            selected: dict[str, dict[str, Any]] = {}
+            non_risk_by_group: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            risk_counts = Counter()
+
+            for row in rows:
+                image_id = row["id"]
+                metadata = metadata_by_id.get(image_id, row)
+                ann = self._annotations_cache.get(image_id, {})
+                risks = _annotation_risks(metadata, ann)
+                group = str(metadata.get("annotator_group") or "未分组")
+                base = {
+                    "image_id": image_id,
+                    "relative_path": str(metadata.get("relative_path") or metadata.get("file_name") or ""),
+                    "annotator_group": group,
+                    "tasks": ",".join(metadata.get("tasks", []) or []),
+                    "stage": _annotation_stage(ann),
+                    "risks": ",".join(risks),
+                    "reason": "",
+                }
+                if risks:
+                    risk_counts.update(risks)
+                    if risk_required:
+                        base["reason"] = "risk_required"
+                        selected[image_id] = base
+                else:
+                    non_risk_by_group[group].append(base)
+
+            random_added = 0
+            for group, group_rows in sorted(non_risk_by_group.items()):
+                if not group_rows:
+                    continue
+                rng.shuffle(group_rows)
+                sample_count = int(round(len(group_rows) * sample_rate))
+                if sample_rate > 0:
+                    sample_count = max(min_per_group, sample_count)
+                sample_count = min(sample_count, len(group_rows))
+                for row in group_rows[:sample_count]:
+                    row["reason"] = f"random_{sample_rate:.0%}"
+                    selected[row["image_id"]] = row
+                    random_added += 1
+
+            items = sorted(selected.values(), key=lambda item: (item["annotator_group"], item["reason"] != "risk_required", item["relative_path"]))
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            csv_path = self.exports_dir / f"review_sampling_queue_{timestamp}.csv"
+            json_path = self.exports_dir / f"review_sampling_queue_{timestamp}.json"
+            fields = ["image_id", "relative_path", "annotator_group", "tasks", "stage", "risks", "reason"]
+            with csv_path.open("w", encoding="utf-8-sig", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(items)
+            payload = {
+                "generated_at": datetime.utcnow().isoformat() + "Z",
+                "filters": filters,
+                "sample_rate": sample_rate,
+                "min_per_group": min_per_group,
+                "risk_required": risk_required,
+                "seed": seed,
+                "matched": len(rows),
+                "selected": len(items),
+                "risk_selected": sum(1 for item in items if item["reason"] == "risk_required"),
+                "random_selected": random_added,
+                "risk_counts": dict(risk_counts),
+                "items": items,
+            }
+            self._write_json(json_path, payload)
+            return {
+                "matched": len(rows),
+                "selected": len(items),
+                "risk_selected": payload["risk_selected"],
+                "random_selected": random_added,
+                "risk_counts": dict(risk_counts),
+                "csv_path": str(csv_path),
+                "json_path": str(json_path),
+            }
+
+    def write_dataset_card(self) -> dict[str, str]:
+        report = self.quality_report()
+        stats = self.stats()
+        lines = [
+            "# UAIV Dataset Card",
+            "",
+            f"- Generated at: `{report['generated_at']}`",
+            f"- Total images: `{report['total_images']}`",
+            "",
+            "## Distribution",
+            "",
+            "### Batches",
+            _markdown_counter(stats.get("batch_counts", {})),
+            "### Scenes",
+            _markdown_counter(stats.get("scene_counts", {})),
+            "### Weather",
+            _markdown_counter(stats.get("weather_counts", {})),
+            "### Tasks",
+            _markdown_counter(stats.get("task_counts", {})),
+            "### Review Status",
+            _markdown_counter(stats.get("review_status_counts", {})),
+            "",
+            "## Quality Checks",
+            "",
+            f"- Broken image paths: `{report['broken_image_path_count']}`",
+            f"- Images without tasks: `{report['images_without_task_count']}`",
+            f"- Low-confidence objects (<0.5): `{report['low_confidence_object_count']}`",
+            "",
+            "### Missing Metadata Fields",
+            _markdown_counter(report.get("missing_metadata_fields", {})),
+            "",
+            "## Lead Time",
+            "",
+            f"- Prediction-to-review samples: `{report.get('lead_time', {}).get('count', 0)}`",
+            f"- Average seconds: `{report.get('lead_time', {}).get('avg_seconds', 0)}`",
+        ]
+        path = self.exports_dir / "DATASET_CARD.md"
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return {"path": str(path)}
 
     def facets(self) -> dict[str, list[str]]:
         with self._lock:
@@ -194,6 +535,7 @@ class AnnotationStore:
                 "batches": sorted({item.get("batch", "") for item in self._metadata_cache if item.get("batch")}),
                 "scenes": sorted({item.get("scene", "") for item in self._metadata_cache if item.get("scene")}),
                 "weather": sorted({item.get("weather", "") for item in self._metadata_cache if item.get("weather")}),
+                "annotator_groups": sorted({item.get("annotator_group", "") for item in self._metadata_cache if item.get("annotator_group")}),
                 "source_types": sorted({_source_type(item) for item in self._metadata_cache}),
             }
 
@@ -281,11 +623,20 @@ class AnnotationStore:
             object_counter = Counter()
             event_counter = Counter()
             origin_counter = Counter()
+            source_counter = Counter()
+            stage_counter = Counter()
+            metadata_ids = {item["id"] for item in self._metadata_cache}
+            for item in self._metadata_cache:
+                ann = self._annotations_cache.get(item["id"])
+                stage_counter.update([_annotation_stage(ann)])
             for ann in self._annotations_cache.values():
+                source_counter.update(_annotation_source_counts(ann))
                 for obj in ann.get("objects", []):
                     object_counter.update([obj.get("label", "unknown")])
                     origin_counter.update([_annotation_origin(obj.get("status", ""))])
                 event_counter.update(evt.get("label", "unknown") for evt in ann.get("events", []))
+            for image_id in set(self._annotations_cache) - metadata_ids:
+                stage_counter.update([_annotation_stage(self._annotations_cache.get(image_id))])
             return {
                 "total_images": len(self._metadata_cache),
                 "task_counts": dict(task_counter),
@@ -293,10 +644,13 @@ class AnnotationStore:
                 "weather_counts": dict(weather_counter),
                 "batch_counts": dict(batch_counter),
                 "review_status_counts": dict(status_counter),
+                "annotation_stage_counts": dict(stage_counter),
+                "annotation_source_counts": dict(source_counter),
                 "object_counts": dict(object_counter),
                 "object_origin_counts": dict(origin_counter),
                 "event_counts": dict(event_counter),
                 "lead_time": self._lead_time_stats(),
+                "index": self.index_status(),
             }
 
     def _lead_time_stats(self) -> dict[str, Any]:
@@ -344,6 +698,16 @@ class AnnotationStore:
                 return self._export_voc()
             if fmt == "qa":
                 return self._export_qa()
+            if fmt == "yolo":
+                return self._export_yolo()
+            if fmt == "yolo_obb":
+                return self._export_yolo_obb()
+            if fmt == "dota":
+                return self._export_dota()
+            if fmt == "geojson":
+                return self._export_geojson()
+            if fmt == "mask":
+                return self._export_masks()
             raise ValueError(f"Unsupported export format: {fmt}")
 
     def _export_json(self) -> dict[str, str]:
@@ -377,6 +741,32 @@ class AnnotationStore:
                         "area": w * h,
                         "iscrowd": 0,
                         "score": obj.get("score"),
+                        "rotation": obj.get("rotation", 0),
+                    }
+                )
+            for segment in ann.get("segments", []):
+                points = segment.get("points", [])
+                if len(points) < 3:
+                    continue
+                label = segment.get("label", "region")
+                categories.setdefault(label, len(categories) + 1)
+                xs = [float(point[0]) for point in points]
+                ys = [float(point[1]) for point in points]
+                x = min(xs)
+                y = min(ys)
+                w = max(xs) - x
+                h = max(ys) - y
+                flat_points = [coord for point in points for coord in [float(point[0]), float(point[1])]]
+                coco_annotations.append(
+                    {
+                        "id": len(coco_annotations) + 1,
+                        "image_id": image_id_map[item["id"]],
+                        "category_id": categories[label],
+                        "bbox": [x, y, w, h],
+                        "segmentation": [flat_points],
+                        "area": _polygon_area(points),
+                        "iscrowd": 0,
+                        "score": segment.get("score"),
                     }
                 )
         payload = {
@@ -421,6 +811,7 @@ class AnnotationStore:
                 SubElement(box, "ymin").text = str(int(y))
                 SubElement(box, "xmax").text = str(int(x + w))
                 SubElement(box, "ymax").text = str(int(y + h))
+                SubElement(node, "rotation").text = str(obj.get("rotation", 0))
             (out_dir / f"{image_id}.xml").write_bytes(tostring(root, encoding="utf-8"))
         return {"path": str(out_dir)}
 
@@ -447,6 +838,99 @@ class AnnotationStore:
         path = self.exports_dir / "qa_annotations.jsonl"
         path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
         return {"path": str(path)}
+
+    def _export_yolo(self) -> dict[str, str]:
+        out_dir = self.exports_dir / "yolo"
+        label_dir = out_dir / "labels"
+        label_dir.mkdir(parents=True, exist_ok=True)
+        categories = _category_map(self._annotations_cache, include_segments=False)
+        (out_dir / "classes.txt").write_text("\n".join(categories) + ("\n" if categories else ""), encoding="utf-8")
+        for item in self._metadata_cache:
+            width = float(item.get("width") or 1)
+            height = float(item.get("height") or 1)
+            ann = self._annotations_cache.get(item["id"], {})
+            lines = []
+            for obj in ann.get("objects", []):
+                label = obj.get("label", "unknown")
+                if label not in categories:
+                    continue
+                x, y, w, h = [float(v) for v in obj.get("bbox", [0, 0, 0, 0])]
+                values = [(x + w / 2) / width, (y + h / 2) / height, w / width, h / height]
+                lines.append(" ".join([str(categories[label])] + [f"{_clamp01(value):.6f}" for value in values]))
+            (label_dir / f"{item['id']}.txt").write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+        return {"path": str(out_dir)}
+
+    def _export_yolo_obb(self) -> dict[str, str]:
+        out_dir = self.exports_dir / "yolo_obb"
+        label_dir = out_dir / "labels"
+        label_dir.mkdir(parents=True, exist_ok=True)
+        categories = _category_map(self._annotations_cache, include_segments=False)
+        (out_dir / "classes.txt").write_text("\n".join(categories) + ("\n" if categories else ""), encoding="utf-8")
+        for item in self._metadata_cache:
+            width = float(item.get("width") or 1)
+            height = float(item.get("height") or 1)
+            ann = self._annotations_cache.get(item["id"], {})
+            lines = []
+            for obj in ann.get("objects", []):
+                label = obj.get("label", "unknown")
+                if label not in categories:
+                    continue
+                coords = []
+                for x, y in _rotated_box_points(obj.get("bbox", [0, 0, 0, 0]), float(obj.get("rotation", 0) or 0)):
+                    coords.extend([_clamp01(x / width), _clamp01(y / height)])
+                lines.append(" ".join([str(categories[label])] + [f"{value:.6f}" for value in coords]))
+            (label_dir / f"{item['id']}.txt").write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+        return {"path": str(out_dir)}
+
+    def _export_dota(self) -> dict[str, str]:
+        out_dir = self.exports_dir / "dota"
+        label_dir = out_dir / "labelTxt"
+        label_dir.mkdir(parents=True, exist_ok=True)
+        for item in self._metadata_cache:
+            ann = self._annotations_cache.get(item["id"], {})
+            lines = ["imagesource:UAIV-Labeler", "gsd:unknown"]
+            for obj in ann.get("objects", []):
+                label = str(obj.get("label", "unknown")).replace(" ", "_")
+                points = _rotated_box_points(obj.get("bbox", [0, 0, 0, 0]), float(obj.get("rotation", 0) or 0))
+                coords = [str(round(coord, 2)) for point in points for coord in point]
+                lines.append(" ".join(coords + [label, "0"]))
+            (label_dir / f"{item['id']}.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return {"path": str(out_dir)}
+
+    def _export_geojson(self) -> dict[str, str]:
+        metadata_by_id = {item["id"]: item for item in self._metadata_cache}
+        features = []
+        for image_id, ann in self._annotations_cache.items():
+            meta = metadata_by_id.get(image_id, {})
+            for obj in ann.get("objects", []):
+                points = _rotated_box_points(obj.get("bbox", [0, 0, 0, 0]), float(obj.get("rotation", 0) or 0))
+                features.append(_geojson_feature(image_id, meta, obj.get("label", "object"), points, "object", obj))
+            for seg in ann.get("segments", []):
+                points = seg.get("points", [])
+                if len(points) >= 3:
+                    features.append(_geojson_feature(image_id, meta, seg.get("label", "region"), points, "segment", seg))
+        path = self.exports_dir / "annotations_geojson.json"
+        self._write_json(path, {"type": "FeatureCollection", "features": features})
+        return {"path": str(path)}
+
+    def _export_masks(self) -> dict[str, str]:
+        out_dir = self.exports_dir / "masks"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        categories = _category_map(self._annotations_cache, include_segments=True)
+        (out_dir / "classes.txt").write_text("\n".join(categories) + ("\n" if categories else ""), encoding="utf-8")
+        for item in self._metadata_cache:
+            width = int(item.get("width") or 1)
+            height = int(item.get("height") or 1)
+            ann = self._annotations_cache.get(item["id"], {})
+            mask = Image.new("L", (width, height), 0)
+            draw = ImageDraw.Draw(mask)
+            for seg in ann.get("segments", []):
+                points = seg.get("points", [])
+                label = seg.get("label", "region")
+                if len(points) >= 3 and label in categories:
+                    draw.polygon([(float(x), float(y)) for x, y in points], fill=int(categories[label]) + 1)
+            mask.save(out_dir / f"{item['id']}.png")
+        return {"path": str(out_dir)}
 
 
 def _optional_float(value: Any) -> float | str:
@@ -544,13 +1028,171 @@ def _source_type(item: dict[str, Any]) -> str:
 
 
 def _annotation_origin(status: str) -> str:
-    if str(status).startswith("model"):
+    value = str(status or "").strip().lower()
+    if value.startswith("model") or value in {"predicted", "prediction"}:
         return "model"
-    if status == "human":
+    if value == "human":
         return "human"
-    if status == "empty":
+    if value == "rule_prefill":
+        return "rule_prefill"
+    if value in {"imported", "weak_label", "preloaded"}:
+        return "imported_prefill"
+    if value == "empty":
         return "empty"
     return "unknown"
+
+
+def _annotation_source_counts(annotation: dict[str, Any]) -> Counter:
+    counts: Counter = Counter()
+    for key in ("scene", "environment", "urban_structure", "restoration"):
+        value = annotation.get(key)
+        if isinstance(value, dict):
+            counts.update([_annotation_origin(value.get("status", ""))])
+    for key in ("objects", "segments", "ocr", "events"):
+        for item in annotation.get(key, []) or []:
+            if isinstance(item, dict):
+                counts.update([_annotation_origin(item.get("status", ""))])
+    return counts
+
+
+def _annotation_stage(annotation: dict[str, Any] | None) -> str:
+    if not annotation:
+        return "no_annotation"
+    status = normalize_review_status(annotation.get("review_status"))
+    if status in {"verified", "rejected"}:
+        return status
+    sources = _annotation_source_counts(annotation)
+    if sources.get("human", 0):
+        return "human_labeled"
+    if sources.get("model", 0):
+        return "model_prefill"
+    if sources.get("imported_prefill", 0):
+        return "imported_prefill"
+    if sources.get("rule_prefill", 0):
+        return "rule_prefill"
+    if status == "labeled":
+        return "human_labeled"
+    if status == "predicted":
+        return "model_prefill"
+    return "empty_annotation"
+
+
+def _annotation_risks(metadata: dict[str, Any], annotation: dict[str, Any] | None) -> list[str]:
+    annotation = annotation or {}
+    tasks = set(metadata.get("tasks", []))
+    status = normalize_review_status(annotation.get("review_status"))
+    stage = _annotation_stage(annotation)
+    risks: list[str] = []
+    if stage in {"rule_prefill", "imported_prefill", "model_prefill"}:
+        risks.append(f"{stage}_unconfirmed")
+    if stage == "no_annotation":
+        risks.append("no_annotation")
+    if status == "rejected" and not str(annotation.get("reject_reason") or "").strip():
+        risks.append("rejected_without_reason")
+    if "object_detection" in tasks and not annotation.get("objects"):
+        risks.append("missing_objects")
+    expected_object_label = metadata.get("object_label")
+    if expected_object_label and any(obj.get("label") and obj.get("label") != expected_object_label for obj in annotation.get("objects", []) or []):
+        risks.append("object_label_conflict")
+    for obj in annotation.get("objects", []) or []:
+        try:
+            score = float(obj.get("score"))
+        except (TypeError, ValueError):
+            continue
+        if score < 0.5:
+            risks.append("low_confidence_object")
+            break
+    if "ocr" in tasks and not annotation.get("ocr"):
+        risks.append("missing_ocr")
+    if "scene_classification" in tasks:
+        scene = annotation.get("scene") if isinstance(annotation.get("scene"), dict) else {}
+        label = scene.get("label")
+        if not label or label == "未标注":
+            risks.append("missing_scene")
+        if label == "mixed" and not (scene.get("combination_label") or scene.get("secondary_labels")):
+            risks.append("mixed_without_secondary_labels")
+    if "urban_structure" in tasks:
+        structure = annotation.get("urban_structure") if isinstance(annotation.get("urban_structure"), dict) else {}
+        if not (structure.get("label") or structure.get("summary")):
+            risks.append("missing_urban_structure")
+    if tasks & {"event_qa", "event_understanding"}:
+        events = annotation.get("events", []) or []
+        if not events or not isinstance(events[0], dict) or not events[0].get("label"):
+            risks.append("missing_event_label")
+    if "environment_state" in tasks:
+        environment = annotation.get("environment") if isinstance(annotation.get("environment"), dict) else {}
+        if not environment.get("label") or environment.get("label") == "未知":
+            risks.append("missing_environment")
+    return sorted(set(risks))
+
+
+def _polygon_area(points: list[list[float]]) -> float:
+    if len(points) < 3:
+        return 0.0
+    total = 0.0
+    for index, point in enumerate(points):
+        next_point = points[(index + 1) % len(points)]
+        total += float(point[0]) * float(next_point[1]) - float(next_point[0]) * float(point[1])
+    return abs(total) / 2.0
+
+
+def _rotated_box_points(bbox: list[Any], rotation: float) -> list[list[float]]:
+    x, y, w, h = [float(value) for value in bbox]
+    cx = x + w / 2
+    cy = y + h / 2
+    rad = rotation * 3.141592653589793 / 180.0
+    cos_v = math.cos(rad)
+    sin_v = math.sin(rad)
+    points = []
+    for dx, dy in [(-w / 2, -h / 2), (w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2)]:
+        points.append([cx + dx * cos_v - dy * sin_v, cy + dx * sin_v + dy * cos_v])
+    return points
+
+
+def _category_map(annotations: dict[str, Any], include_segments: bool) -> dict[str, int]:
+    labels = set()
+    for ann in annotations.values():
+        labels.update(str(obj.get("label", "unknown")) for obj in ann.get("objects", []))
+        if include_segments:
+            labels.update(str(seg.get("label", "region")) for seg in ann.get("segments", []))
+    return {label: index for index, label in enumerate(sorted(label for label in labels if label))}
+
+
+def _clamp01(value: float) -> float:
+    return max(0.0, min(1.0, float(value)))
+
+
+def _geojson_feature(image_id: str, meta: dict[str, Any], label: Any, points: list[Any], geometry_type: str, source: dict[str, Any]) -> dict[str, Any]:
+    polygon = [[float(x), float(y)] for x, y in points]
+    if polygon and polygon[0] != polygon[-1]:
+        polygon.append(polygon[0])
+    return {
+        "type": "Feature",
+        "properties": {
+            "image_id": image_id,
+            "file_name": meta.get("file_name"),
+            "label": str(label or "unknown"),
+            "geometry_type": geometry_type,
+            "source_status": source.get("status"),
+            "score": source.get("score"),
+            "rotation": source.get("rotation", 0),
+            "metadata": meta,
+        },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [polygon],
+        },
+    }
+
+
+def _markdown_counter(values: dict[str, Any]) -> str:
+    if not values:
+        return "\nNo records.\n"
+    lines = ["", "| Item | Count |", "|:--|--:|"]
+    for key, value in sorted(values.items(), key=lambda item: str(item[0])):
+        lines.append(f"| {key} | {value} |")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def normalize_review_status(status: Any) -> str:
@@ -589,6 +1231,10 @@ def validate_annotation_payload(payload: dict[str, Any]) -> dict[str, Any]:
             obj["bbox"] = [float(item) for item in bbox]
         except (TypeError, ValueError) as exc:
             raise ValueError(f"objects[{index}].bbox contains non-numeric values.") from exc
+        try:
+            obj["rotation"] = float(obj.get("rotation", obj.get("angle", 0)) or 0)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"objects[{index}].rotation must be numeric.") from exc
         obj["label"] = str(obj.get("label") or "object")
     for index, segment in enumerate(clean["segments"]):
         if not isinstance(segment, dict):
@@ -599,5 +1245,11 @@ def validate_annotation_payload(payload: dict[str, Any]) -> dict[str, Any]:
         for point_index, point in enumerate(points):
             if not isinstance(point, list) or len(point) != 2:
                 raise ValueError(f"segments[{index}].points[{point_index}] must be [x, y].")
+            try:
+                point[0] = float(point[0])
+                point[1] = float(point[1])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"segments[{index}].points[{point_index}] contains non-numeric values.") from exc
+        segment["label"] = str(segment.get("label") or "region")
     clean["review_status"] = normalize_review_status(clean.get("review_status"))
     return clean

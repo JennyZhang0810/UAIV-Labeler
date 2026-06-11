@@ -1,15 +1,15 @@
 {
   "models": {
     "s2det_yolov8s": {
-      "enabled": false,
+      "enabled": true,
       "mode": "local",
-      "name": "Object Detection · s2det-yolov8s",
+      "name": "Object Detection · YOLOv8s Smoke Test",
       "task": "object_detection",
       "provider": "S2Det / Ultralytics",
-      "python": "/path/to/conda/env/bin/python",
-      "weights": "/path/to/weights/best.pt",
+      "python": "/path/to/python",
+      "weights": "/path/to/yolov8s.pt",
       "metric_source": "",
-      "description": "Optional local YOLOv8s detector. Set enabled=true after configuring python and weights."
+      "description": "Optional local YOLOv8s backend for object-counting workflow smoke tests. Replace python and weights with paths from your own deployment."
     },
     "segearth_ov": {
       "enabled": false,
@@ -52,4 +52,3 @@
     }
   }
 }
-

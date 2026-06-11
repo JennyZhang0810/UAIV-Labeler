@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>遥感半自动化标注平台</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260520_uaiv_labeler">
+    <link rel="stylesheet" href="/static/styles.css?v=20260610_admin_list_home2">
   </head>
   <body>
     <div id="toastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
@@ -24,6 +24,7 @@
       <button class="rail-item" data-rail-view="guide" type="button">说明</button>
       <div class="rail-footer">
         <span>Low-altitude<br>Annotation</span>
+        <a href="https://jennyzhang0810.github.io/UAIV-Labeler/" target="_blank" rel="noreferrer">Project Page</a>
         <a href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">GitHub</a>
       </div>
     </aside>
@@ -59,6 +60,11 @@
               <option value="json">JSON</option>
               <option value="coco">COCO</option>
               <option value="voc">VOC</option>
+              <option value="yolo">YOLO</option>
+              <option value="yolo_obb">YOLO-OBB</option>
+              <option value="dota">DOTA</option>
+              <option value="geojson">GeoJSON</option>
+              <option value="mask">Mask PNG</option>
               <option value="qa">QA</option>
             </select>
             <button data-export-run="server" type="button">导出</button>
@@ -69,6 +75,11 @@
               <option value="json">JSON</option>
               <option value="coco">COCO</option>
               <option value="voc">VOC</option>
+              <option value="yolo">YOLO</option>
+              <option value="yolo_obb">YOLO-OBB</option>
+              <option value="dota">DOTA</option>
+              <option value="geojson">GeoJSON</option>
+              <option value="mask">Mask PNG</option>
               <option value="qa">QA</option>
             </select>
             <button data-export-run="local" type="button">下载</button>
@@ -82,18 +93,19 @@
         <div class="home-hero panel">
           <div>
             <span class="home-kicker">UAIV-Labeler</span>
-            <h2>低空遥感多任务数据构建工作台</h2>
-            <p>面向无人机多场景、多天气、多高度影像，统一管理 Metadata、模型预标注、人工复核、QA 核查和 Benchmark 导出，支撑城市大模型、生态大模型与图像复原数据生产。</p>
-            <div class="home-actions">
-              <button class="home-primary" data-home-action="workbench" type="button">进入标注工作台</button>
-              <button data-home-action="qa" type="button">进入 QA 核查</button>
-              <a class="home-link-button" href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">GitHub</a>
-            </div>
+            <h2>低空城市治理数据标注生产平台</h2>
+            <p>围绕真实无人机影像的数据生产流程，把服务器目录索引、12 组任务分配、规则/OCR/模型草稿、人工复核、风险队列、抽检清单和 Benchmark 导出放在同一个工作台里。</p>
+          <div class="home-actions">
+            <button class="home-primary" data-home-action="workbench" type="button">进入标注工作台</button>
+            <button data-home-action="qa" type="button">进入 QA 核查</button>
+            <a class="home-link-button project-page-button" href="https://jennyzhang0810.github.io/UAIV-Labeler/" target="_blank" rel="noreferrer">项目主页</a>
+            <a class="home-link-button github-button" href="https://github.com/JennyZhang0810/UAIV-Labeler" target="_blank" rel="noreferrer">GitHub</a>
+          </div>
           </div>
           <div class="home-metrics">
-            <div><span>Data</span><strong>Metadata-first</strong></div>
-            <div><span>Workflow</span><strong>Pre-label + Review</strong></div>
-            <div><span>Export</span><strong>COCO / VOC / QA</strong></div>
+            <div><span>Current Batch</span><strong>4796 Images / 12 Groups</strong></div>
+            <div><span>Workflow</span><strong>Draft + Review + QA</strong></div>
+            <div><span>Control</span><strong>Risk Queue + Sampling</strong></div>
           </div>
         </div>
 
@@ -121,6 +133,20 @@
           </div>
         </section>
 
+        <section class="home-section home-advantages panel">
+          <div>
+            <span class="home-kicker">Production-Oriented</span>
+            <h3>把复杂标注流程交给平台，把简单操作留给标注员</h3>
+            <p>UAIV-Labeler 不只是画框工具。它会根据每张图的 metadata 自动显示该做的任务，先给出可追踪草稿，再让人工确认、修改和补漏，最后用风险队列和抽检清单支撑质控。</p>
+          </div>
+          <div class="advantage-grid">
+            <div><strong>任务感知界面</strong><span>目标检测、OCR、场景、城市功能、事件、环境等模块按当前图像自动显示。</span></div>
+            <div><strong>规则与已有标签预填</strong><span>场景、城市功能、观测条件和事件可按文件夹名/metadata 预填；OCR A 组可复核已有标签。</span></div>
+            <div><strong>半自动化但可控</strong><span>规则、OCR、模型草稿和人工标注分来源统计，不把未复核草稿直接当最终标签。</span></div>
+            <div><strong>管理与质检闭环</strong><span>管理员可按筛选范围批量预标注、查看风险样本、导出抽检清单和发布格式。</span></div>
+          </div>
+        </section>
+
         <section class="home-section uaiv-dataset panel">
           <div>
             <span class="home-kicker">Published Dataset</span>
@@ -141,8 +167,8 @@
 
         <section class="home-section home-flow panel">
           <div>
-            <h3>标准流程</h3>
-            <p>导入影像并建立索引，运行模型生成初始标注，人工复核后导出训练集和 Benchmark 文件。</p>
+            <h3>正式标注流程</h3>
+            <p>先由管理员导入并预填，再由标注员按组复核，最后由管理员质检、抽检和导出。</p>
           </div>
           <ol>
             <li>数据导入与 Metadata 校验</li>
@@ -164,6 +190,25 @@
             <div><strong>Server Deployment</strong><span>部署到团队服务器后，才能浏览该服务器或挂载盘数据。</span></div>
             <div><strong>Model Plugin</strong><span>真实 YOLO / SAM / SegEarth / VLM 模型需在部署环境中配置。</span></div>
           </div>
+          <div class="project-page-link">
+            <span>Public Project Page</span>
+            <strong>公开介绍页用于展示平台定位、功能边界和开源说明；真实标注工作仍在当前生产工作台完成。</strong>
+            <a href="https://jennyzhang0810.github.io/UAIV-Labeler/" target="_blank" rel="noreferrer">打开 UAIV-Labeler 项目主页</a>
+          </div>
+        </section>
+
+        <section class="home-section offline-flow panel">
+          <div>
+            <span class="home-kicker">Offline Workflow</span>
+            <h3>离线 Demo 是独立本机流程</h3>
+            <p>离线模式不依赖公网入口，也不会读取访问者之外的服务器磁盘。它用于本机试用、无网络演示和手动标注教学，默认只读取仓库内置示例数据。</p>
+          </div>
+          <ol>
+            <li>克隆仓库并安装依赖</li>
+            <li>运行 <code>bash offline_demo/run_offline.sh</code></li>
+            <li>打开 <code>http://127.0.0.1:7860</code></li>
+            <li>导入 <code>sample_data/images</code> 并手动标注/导出</li>
+          </ol>
         </section>
       </section>
     </main>
@@ -171,6 +216,15 @@
     <main id="workbenchView" class="layout hidden">
       <datalist id="objectLabelOptions"></datalist>
       <aside class="sidebar">
+        <section class="panel admin-entry-panel">
+          <div class="panel-head">
+            <h2>管理员入口</h2>
+            <span>数据导入</span>
+          </div>
+          <p>导入服务器目录、电脑本地文件夹，或执行规则回填。</p>
+          <button id="openAdminImport" type="button">打开数据导入</button>
+        </section>
+
         <section class="panel task-domain-panel">
           <div class="panel-head">
             <h2>任务方向</h2>
@@ -183,14 +237,21 @@
               <option value="restoration">图像复原</option>
             </select>
           </label>
+          <label>工作模式
+            <select id="assistMode">
+              <option value="assisted">半自动化复核</option>
+              <option value="manual">纯人工标注</option>
+            </select>
+          </label>
           <div id="taskDomainHint" class="upload-summary">城市大模型：目标/区域标注 + QA 对标注 + 城市结构理解。</div>
         </section>
 
-        <section class="panel import-panel">
-          <div class="panel-head">
-            <h2>数据导入</h2>
-            <span>批量建立索引</span>
-          </div>
+        <details id="adminImportPanel" class="panel import-panel utility-panel admin-import-panel">
+          <summary class="panel-head">
+            <h2>数据导入 / 管理员</h2>
+            <span>服务器目录 · 电脑本地</span>
+          </summary>
+          <p class="hint">日常标注不需要展开这里。工作人员只使用下方筛选和图像列表。</p>
           <div class="import-tabs">
             <button id="serverImportTab" class="tab-button active" type="button">服务器目录</button>
             <button id="clientImportTab" class="tab-button" type="button">电脑本地</button>
@@ -237,31 +298,39 @@
             </label>
           </div>
           <button id="importFolder">开始导入</button>
-        </section>
+          <div class="admin-actions">
+            <button id="previewRulePrefill" type="button">预览规则回填</button>
+            <button id="applyRulePrefill" type="button">应用规则回填</button>
+          </div>
+          <p id="rulePrefillSummary" class="upload-summary">规则回填只处理未建记录或空 annotation，不覆盖人工、OCR 导入或模型草稿。</p>
+        </details>
 
-        <section class="panel">
+        <section class="panel filter-panel">
           <div class="panel-head">
             <h2>筛选</h2>
             <span id="imageCount">0 张</span>
           </div>
-          <label>任务<select id="taskFilter"><option value="">全部</option></select></label>
+          <label class="primary-filter">标注组别<select id="annotatorGroupFilter"><option value="">全部</option></select></label>
           <p class="filter-help">用于在已导入/已索引图像中筛选待标注子集，不会重新读取目录。</p>
-          <label>场景<select id="sceneFilter"><option value="">全部</option></select></label>
-          <label>天气<select id="weatherFilter"><option value="">全部</option></select></label>
-          <label>批次<select id="batchFilter"><option value="">全部</option></select></label>
-          <label>数据来源
-            <select id="sourceTypeFilter">
-              <option value="">全部</option>
-              <option value="actual">实际数据</option>
-              <option value="demo">示例图</option>
-            </select>
-          </label>
-          <div class="row">
-            <label>最低高度<input id="minAltitude" type="number" min="0" placeholder="m"></label>
-            <label>最高高度<input id="maxAltitude" type="number" min="0" placeholder="m"></label>
+          <div class="quick-filter-grid">
+            <label>任务<select id="taskFilter"><option value="">全部</option></select></label>
+            <label>批次<select id="batchFilter"><option value="">全部</option></select></label>
           </div>
           <details class="advanced-filter">
-            <summary>空间范围筛选</summary>
+            <summary>更多筛选</summary>
+            <label>场景<select id="sceneFilter"><option value="">全部</option></select></label>
+            <label>天气<select id="weatherFilter"><option value="">全部</option></select></label>
+            <label>数据来源
+              <select id="sourceTypeFilter">
+                <option value="">全部</option>
+                <option value="actual">实际数据</option>
+                <option value="demo">示例图</option>
+              </select>
+            </label>
+            <div class="row">
+              <label>最低高度<input id="minAltitude" type="number" min="0" placeholder="m"></label>
+              <label>最高高度<input id="maxAltitude" type="number" min="0" placeholder="m"></label>
+            </div>
             <div class="row">
               <label>最小经度<input id="minLongitude" type="number" step="0.000001" placeholder="min lon"></label>
               <label>最大经度<input id="maxLongitude" type="number" step="0.000001" placeholder="max lon"></label>
@@ -271,7 +340,40 @@
               <label>最大纬度<input id="maxLatitude" type="number" step="0.000001" placeholder="max lat"></label>
             </div>
           </details>
-          <button id="applyFilters">应用筛选</button>
+          <div id="activeFilterSummary" class="filter-help">当前显示全部已导入/已索引图像。</div>
+          <div class="filter-actions">
+            <button id="applyFilters" type="button">应用筛选</button>
+            <button id="resetFilters" type="button">重置筛选</button>
+          </div>
+          <div class="risk-queue-box">
+            <label>风险类型
+              <select id="riskTypeFilter">
+                <option value="">全部风险</option>
+                <option value="missing_objects">检测任务空框</option>
+                <option value="rule_prefill_unconfirmed">规则草稿未确认</option>
+                <option value="imported_prefill_unconfirmed">导入草稿未确认</option>
+                <option value="model_prefill_unconfirmed">模型草稿未确认</option>
+                <option value="missing_ocr">OCR 缺失</option>
+                <option value="missing_scene">场景缺失</option>
+                <option value="missing_urban_structure">城市功能缺失</option>
+                <option value="missing_event_label">事件标签缺失</option>
+                <option value="missing_environment">环境标签缺失</option>
+                <option value="object_label_conflict">目标标签冲突</option>
+                <option value="low_confidence_object">低置信目标</option>
+                <option value="rejected_without_reason">驳回缺少原因</option>
+              </select>
+            </label>
+            <div class="risk-actions">
+              <button id="loadRiskQueue" type="button">查看风险队列</button>
+              <button id="clearRiskQueue" type="button">收起</button>
+            </div>
+            <p id="riskQueueSummary" class="upload-summary">风险队列按当前筛选范围生成。</p>
+            <div id="riskQueueList" class="risk-queue-list hidden"></div>
+          </div>
+          <details class="admin-actions">
+            <summary>管理员操作</summary>
+            <button id="clearDatasetIndex" class="danger-button" type="button">清空全部已导入记录</button>
+          </details>
         </section>
 
         <section class="panel list-panel">
@@ -282,20 +384,85 @@
 
       <section class="workspace">
         <section class="summary-grid" id="summaryGrid"></section>
+        <section id="taskAssistPanel" class="task-assist panel">
+          <div class="task-assist-main">
+            <strong id="taskAssistTitle">先选择一张图像</strong>
+            <p id="taskAssistBody">从左侧筛选自己的批次或标注组别，然后点击图像开始。进入图像后默认可直接拖拽画目标框。</p>
+          </div>
+          <div id="taskAssistSteps" class="task-assist-steps"></div>
+        </section>
         <div class="canvas-shell">
           <canvas id="imageCanvas" width="1024" height="768"></canvas>
         </div>
-        <div class="toolbar">
-          <button id="prevImage">上一张</button>
-          <button id="nextImage">下一张</button>
-          <input id="newBoxLabel" list="objectLabelOptions" placeholder="object label">
-          <button id="drawBoxMode">人工画框</button>
-          <button id="addBox">添加目标框</button>
-          <button id="undoAction">撤销上一步</button>
-          <button id="clearAnnotations">清除所有</button>
-          <button id="rerunPrediction">重新预标注</button>
-          <button id="saveReview">保存复核</button>
-          <span id="statusText">未选择图像</span>
+        <div id="ocrPromptPopover" class="ocr-popover hidden">
+          <label>OCR 文字<input id="ocrPromptInput" placeholder="输入识别文字"></label>
+          <div class="ocr-popover-actions">
+            <button id="ocrPromptSave" type="button">保存 OCR</button>
+            <button id="ocrPromptCancel" type="button">取消</button>
+          </div>
+        </div>
+        <div class="toolbar clean-toolbar">
+          <div class="toolbar-main-row">
+            <div class="toolbar-group nav-tools" aria-label="图像导航">
+              <span class="tool-group-label">导航</span>
+              <div class="tool-controls two-actions">
+                <button id="prevImage" title="快捷键：←">上一张</button>
+                <button id="nextImage" title="快捷键：→">下一张</button>
+              </div>
+            </div>
+            <div class="toolbar-group box-tools" aria-label="目标框工具">
+              <span class="tool-group-label">目标框</span>
+              <div class="tool-controls target-actions">
+                <input id="newBoxLabel" list="objectLabelOptions" placeholder="目标类别" title="目标类别，可手动输入">
+                <button id="drawBoxMode" class="hidden-tool-button" title="旧版普通框入口，已合并到目标框">普通框</button>
+                <input id="rotationAngle" type="number" min="-180" max="180" step="1" value="0" title="旋转角度">
+                <button id="drawRotatedBoxMode" title="快捷键 B；角度为空或 0 为普通框，填写角度为旋转框">目标框</button>
+                <button id="addBox" class="hidden-tool-button" title="添加一个默认目标框">添加</button>
+              </div>
+            </div>
+            <div class="toolbar-group ocr-tools" aria-label="OCR 工具">
+              <span class="tool-group-label">OCR</span>
+              <div class="tool-controls two-actions">
+                <button id="drawOcrMode" title="OCR 文字框：快捷键 O，拖拽框住文字后直接输入内容">OCR框</button>
+                <button id="runOcrModel" title="运行已配置的 OCR 模型；未配置时会提示">自动OCR</button>
+              </div>
+            </div>
+            <div class="toolbar-group save-tools" aria-label="保存">
+              <div class="tool-controls">
+                <button id="saveReview" class="primary-save" title="快捷键：Ctrl+S 或 Ctrl+Enter，保存复核并进入下一张">保存</button>
+              </div>
+            </div>
+          </div>
+          <details class="advanced-tools">
+            <summary>高级绘制与编辑</summary>
+            <div class="advanced-tools-grid">
+              <div class="toolbar-group region-tools" aria-label="区域工具">
+                <span class="tool-group-label">区域</span>
+                <div class="tool-controls two-actions">
+                  <button id="pointPolygonMode" title="快捷键 P；点击后逐点标区域；至少 3 个点后点完成区域，Enter 也可完成">点选</button>
+                  <button id="finishPolygon" title="完成当前点选区域" disabled>完成</button>
+                </div>
+              </div>
+              <div class="toolbar-group sam-tools" aria-label="SAM 工具">
+                <span class="tool-group-label">SAM</span>
+                <div class="tool-controls two-actions">
+                  <button id="samPromptMode" title="SAM 未配置时不可用；可先用点选区域">提示点</button>
+                  <button id="runSamPrompt" title="运行已配置的远程 SAM 服务">运行</button>
+                </div>
+              </div>
+              <div class="toolbar-group edit-tools" aria-label="编辑工具">
+                <span class="tool-group-label">编辑</span>
+                <div class="tool-controls edit-actions">
+                  <input id="selectedObjectLabel" list="objectLabelOptions" placeholder="选中框标签" title="先点几何，再选中目标框，可直接修改该框标签">
+                  <button id="editGeometryMode" title="编辑已有框或区域顶点">几何</button>
+                  <button id="undoAction" title="快捷键：Ctrl+Z / Command+Z">撤销</button>
+                  <button id="clearAnnotations" title="只清除当前图像的标注，保存后生效">清除</button>
+                  <button id="rerunPrediction" title="重新运行内置 mock 预标注">预标注</button>
+                </div>
+              </div>
+            </div>
+          </details>
+          <div id="statusText">未选择图像</div>
         </div>
         <section class="model-center panel" data-domain-block="urban ecology">
           <div class="panel-head">
@@ -303,6 +470,23 @@
             <span>智能预标注</span>
           </div>
           <div id="modelList" class="model-list"></div>
+          <div class="batch-model-box">
+            <div class="panel-head">
+              <h2>批量预标注</h2>
+              <span>管理员</span>
+            </div>
+            <p class="hint">使用当前左侧筛选范围。默认只处理未建记录、空记录和规则草稿，不覆盖人工、OCR 导入、模型草稿、核验或驳回样本。</p>
+            <div class="batch-model-grid">
+              <label>批量模型<select id="batchModelSelect"></select></label>
+              <label>上限<input id="batchModelLimit" type="number" min="1" max="1000" value="20"></label>
+              <label class="batch-stage-toggle"><input id="batchIncludeRulePrefill" type="checkbox" checked> 包含规则草稿</label>
+              <div class="batch-model-actions">
+                <button id="previewBatchModel" type="button">预览批量预标注</button>
+                <button id="runBatchModel" type="button">执行批量预标注</button>
+              </div>
+            </div>
+            <p id="batchModelSummary" class="upload-summary">先选择左侧筛选范围，再预览候选数量。</p>
+          </div>
           <div class="custom-model-box">
             <div class="panel-head">
               <h2>自定义模型接入</h2>
@@ -329,19 +513,33 @@
       </section>
 
       <aside class="inspector">
-        <section class="panel">
+        <section class="panel inspector-task-panel">
           <div class="panel-head">
+            <h2>当前任务</h2>
+            <span id="inspectorTaskGroup">未选择</span>
+          </div>
+          <div id="inspectorTaskSummary" class="inspector-task-summary">先从左侧选择自己的标注组别，再点击图像开始。</div>
+          <div id="inspectorRequiredFields" class="inspector-required-fields"></div>
+          <details class="task-guide-card" open>
+            <summary>当前任务怎么标</summary>
+            <div id="taskGuideBody" class="task-guide-body">选择图像后显示当前任务的标注步骤。</div>
+          </details>
+        </section>
+
+        <details class="panel metadata-panel">
+          <summary class="panel-head">
             <h2>Metadata</h2>
             <span>自动读取</span>
-          </div>
+          </summary>
           <dl id="metadataView"></dl>
-        </section>
+        </details>
 
         <section class="panel">
           <div class="panel-head">
             <h2>标注复核</h2>
             <span>人工确认</span>
           </div>
+          <div class="review-sticky-bar">
             <label>复核状态
               <select id="reviewStatus">
               <option value="predicted">模型预标注</option>
@@ -350,24 +548,58 @@
               <option value="rejected">驳回重标</option>
               </select>
             </label>
-          <label data-domain-field="urban ecology restoration">环境<select id="environmentLabel"></select></label>
-          <div class="annotation-module" data-domain-field="urban ecology">
+            <button id="saveReviewSticky" type="button">保存复核</button>
+            <button id="confirmAndNext" type="button">确认并下一张</button>
+          </div>
+          <label data-task-field="review">异常/弃标原因<textarea id="rejectReason" placeholder="仅在驳回重标或异常样本时填写，例如：严重模糊、图像损坏、类别不符"></textarea></label>
+          <label>标注备注<textarea id="reviewNotes" placeholder="记录混合场景、多功能地块、无法分辨个体等补充说明"></textarea></label>
+          <label data-domain-field="urban ecology restoration" data-task-field="environment_state">环境<select id="environmentLabel"></select></label>
+          <details class="shortcut-details" data-domain-field="urban ecology restoration" data-task-field="environment_state">
+            <summary>环境快捷键</summary>
+            <div id="environmentShortcutPanel" class="shortcut-panel environment-shortcuts"></div>
+          </details>
+          <div class="annotation-module" data-domain-field="urban ecology" data-task-field="scene_classification urban_structure">
+            <h3>基础分类</h3>
+            <label data-task-field="scene_classification">场景<input id="sceneLabel" list="sceneLabelOptions" placeholder="选择或输入场景标签"></label>
+            <label data-task-field="scene_classification">场景补充标签<input id="sceneSecondaryLabels" list="sceneLabelOptions" placeholder="mixed 图像可填 residential_area+thoroughfare"></label>
+            <datalist id="sceneLabelOptions"></datalist>
+            <details class="shortcut-details" data-task-field="scene_classification">
+              <summary>场景快捷键</summary>
+              <div id="sceneShortcutPanel" class="shortcut-panel scene-shortcuts"></div>
+            </details>
+            <label data-domain-field="urban" data-task-field="urban_structure">城市结构<input id="urbanStructure" list="urbanStructureOptions" placeholder="选择或输入建筑/设施/结构类型"></label>
+            <label data-domain-field="urban" data-task-field="urban_structure">功能补充标签<input id="urbanSecondaryLabels" list="urbanStructureOptions" placeholder="多功能地块可填 residential_area+commercial_service_area"></label>
+            <datalist id="urbanStructureOptions"></datalist>
+            <details class="shortcut-details" data-domain-field="urban" data-task-field="urban_structure">
+              <summary>城市结构快捷键</summary>
+              <div id="urbanStructureShortcutPanel" class="shortcut-panel structure-shortcuts"></div>
+            </details>
+          </div>
+          <div class="annotation-module" data-domain-field="urban ecology" data-task-field="object_detection semantic_segmentation instance_segmentation">
             <h3>目标与区域标注</h3>
             <p class="hint">检测任务标注目标类别和 bbox；分割任务标注像素掩码。当前手动画框和模型预标注在中间工作区完成。</p>
-            <label>场景<select id="sceneLabel"></select></label>
-            <label>事件<select id="eventLabel"></select></label>
           </div>
-          <div class="annotation-module" data-domain-field="urban ecology">
+          <div class="annotation-module" data-domain-field="urban ecology" data-task-field="event_qa event_understanding">
+            <h3>事件标注</h3>
+            <label>事件<input id="eventLabel" list="eventLabelOptions" placeholder="选择或输入事件标签"></label>
+            <datalist id="eventLabelOptions"></datalist>
+            <details class="shortcut-details">
+              <summary>事件快捷键</summary>
+              <div id="eventShortcutPanel" class="shortcut-panel"></div>
+            </details>
+          </div>
+          <div class="annotation-module" data-domain-field="urban ecology" data-task-field="event_qa event_understanding">
             <h3>QA 对标注</h3>
             <p class="hint">这里用于当前图像的 QA 标注；顶部 QA 工具用于已有 QA 数据集的核查。</p>
             <label>QA 问题<textarea id="qaQuestion"></textarea></label>
             <label>QA 答案<textarea id="qaAnswer"></textarea></label>
           </div>
-          <div class="annotation-module" data-domain-field="urban">
-            <h3>城市结构理解</h3>
-            <label>城市结构理解<textarea id="urbanStructure"></textarea></label>
+          <div class="annotation-module" data-domain-field="urban ecology" data-task-field="ocr">
+            <h3>OCR 文字标注</h3>
+            <p class="hint">使用中间工具栏的 OCR 框，拖拽框住文字后会直接弹出输入框。OCR 标注独立保存，不进入目标框列表。</p>
+            <div id="ocrList" class="ocr-list"></div>
           </div>
-          <div class="annotation-module" data-domain-field="restoration">
+          <div class="annotation-module" data-domain-field="restoration" data-task-field="restoration_pairing">
             <h3>图像复原标注</h3>
             <p class="hint">标注退化类型、退化程度和清晰图像配对关系。</p>
             <label>复原退化类型<select id="degradationLabel"><option value="">无</option></select></label>
@@ -383,12 +615,28 @@
           </div>
         </section>
 
-        <section class="panel" data-domain-block="urban ecology">
+        <section class="panel" data-domain-block="urban ecology" data-task-panel="object_detection">
           <div class="panel-head">
             <h2>目标框</h2>
             <span>检测/计数</span>
           </div>
+          <p class="panel-note">支持水平框与旋转框；角度单位为度，正值为顺时针方向。</p>
+          <div class="bulk-label-tools">
+            <input id="bulkObjectLabel" list="objectLabelOptions" placeholder="批量改成标签">
+            <button id="bulkRelabelSelected" type="button">改选中框</button>
+            <button id="bulkRelabelAll" type="button">改全部框</button>
+            <button id="bulkRelabelSame" type="button">改同类框</button>
+          </div>
           <div id="objectList" class="object-list"></div>
+        </section>
+
+        <section class="panel" data-domain-block="urban ecology" data-task-panel="semantic_segmentation instance_segmentation">
+          <div class="panel-head">
+            <h2>分割区域</h2>
+            <span>手动点选</span>
+          </div>
+          <p class="panel-note">点击“点选区域”后在图像上逐点点击，至少 3 个点后点击“完成区域”。</p>
+          <div id="segmentList" class="object-list"></div>
         </section>
 
         <section class="panel">
@@ -544,6 +792,7 @@
           <nav class="guide-toc panel">
             <h2>目录</h2>
             <a href="#deploy-modes">使用方式</a>
+            <a href="#deploy-offline">离线流程</a>
             <a href="#deploy-fast">快速启动</a>
             <a href="#deploy-data">数据放置</a>
             <a href="#deploy-public">公网访问</a>
@@ -559,8 +808,20 @@
                 <tr><th>服务器部署</th><td>把平台部署到团队自己的服务器或挂载数据盘后，服务器目录导入才能浏览该机器上的大规模图像、TSV/XLSX 和模型输出。</td></tr>
               </table>
             </section>
+            <section id="deploy-offline">
+              <h2>2. 离线 Demo 完整流程</h2>
+              <p>离线 Demo 是本机流程，适合没有公网、不能暴露数据、只需要试用人工标注和导出的场景。它默认只使用仓库内 <code>sample_data/</code>，不包含大型模型权重，也不会让外部用户访问这台机器。</p>
+              <ol>
+                <li>克隆或复制 <code>UAIV-Labeler</code> 仓库到本机。</li>
+                <li>安装 Python 依赖：<code>pip install -r requirements.txt</code>。</li>
+                <li>启动离线脚本：<code>bash offline_demo/run_offline.sh</code>；Windows 可运行 <code>offline_demo\run_offline.bat</code>。</li>
+                <li>浏览器打开 <code>http://127.0.0.1:7860</code>。</li>
+                <li>使用 <code>sample_data/images</code> 试用导入、画框、旋转框、点选区域、保存和导出。</li>
+              </ol>
+              <p>在线演示和服务器部署则面向多人访问或大规模数据盘，需要公网入口、服务器目录权限和可选模型环境。</p>
+            </section>
             <section id="deploy-fast">
-              <h2>2. 快速启动</h2>
+              <h2>3. 快速启动</h2>
               <h3>离线 Demo</h3>
               <pre>cd /path/to/UAIV-Labeler
 pip install -r requirements.txt
@@ -575,7 +836,7 @@ bash scripts/start_public.sh</pre>
               <pre>http://&lt;外部服务器IP&gt;:7860</pre>
             </section>
             <section id="deploy-data">
-              <h2>3. 数据放置</h2>
+              <h2>4. 数据放置</h2>
               <p>推荐把图像、TSV、XLSX 放在同一台服务器的数据盘，例如：</p>
               <pre>/data/UAIV/images
 /data/UAIV/QA/questions.tsv
@@ -583,15 +844,15 @@ bash scripts/start_public.sh</pre>
               <p>如果使用 QA 工具，建议将 QA 文件和配套图像放在同一数据目录下；平台会根据题目中的图像信息自动匹配，必要时也可以手动指定 QA 图像目录。</p>
             </section>
             <section id="deploy-public">
-              <h2>4. 公网访问</h2>
+              <h2>5. 公网访问</h2>
               <p>当前公开演示地址：</p>
-              <pre>http://121.48.163.156:7860</pre>
+              <pre>http://8.137.184.86</pre>
               <p>其他服务器部署时，需要开放 7860 端口。云服务器还要在安全组/防火墙中放行 TCP 7860。</p>
               <pre>http://&lt;server-ip&gt;:7860</pre>
               <p><code>127.0.0.1</code> 只代表服务器本机内部访问，不能作为发给外部用户的公开链接。</p>
             </section>
             <section id="deploy-domain">
-              <h2>5. 域名与正式服务</h2>
+              <h2>6. 域名与正式服务</h2>
               <p>长期公开建议使用 Gunicorn + Nginx。仓库已提供模板：</p>
               <pre>deploy/nginx_annotation.conf
 deploy/uaiv-labeler.service
@@ -599,7 +860,7 @@ deploy/DOMAIN_DEPLOYMENT.md</pre>
               <p>有 root 权限后，可按 <code>deploy/DOMAIN_DEPLOYMENT.md</code> 配置域名、Nginx 反向代理和 HTTPS。</p>
             </section>
             <section id="deploy-limits">
-              <h2>6. 注意事项</h2>
+              <h2>7. 注意事项</h2>
               <ul>
                 <li>公开演示可以用当前 Flask 服务；正式多人使用建议加登录认证。</li>
                 <li>本地上传适合小规模 TSV/XLSX 或少量图片，大规模数据应使用服务器目录或挂载盘。</li>
@@ -701,6 +962,14 @@ deploy/DOMAIN_DEPLOYMENT.md</pre>
               <h2>7. 人工标注</h2>
               <h3>人工画框</h3>
               <p>在工具栏输入目标类别，例如 <code>ship</code>、<code>vehicle</code>、<code>person</code>，点击“人工画框”，然后在图像上拖拽生成 bbox。右侧目标框列表可修改类别与坐标。</p>
+              <h3>旋转框</h3>
+              <p>在角度输入框中填写旋转角度，点击“旋转框”，然后在图像上拖拽生成带角度的目标框。角度会保存到目标对象的 <code>rotation</code> 字段，并随 JSON/COCO/VOC 导出。</p>
+              <h3>点选区域</h3>
+              <p>点击“点选区域”后，在图像上逐点点击生成多边形；至少 3 个点后点击“完成区域”或双击图像完成。该结果保存到 <code>segments[].points</code>，适合道路、水体、湿地、农田等区域标注。</p>
+              <h3>SAM 提示点</h3>
+              <p>点击“SAM提示点”后，在图像上点击一个或多个前景提示点，再点击“运行SAM”。平台会把图像路径、Metadata、当前标注和提示点发送给独立 SAM 类 HTTP 服务，返回的区域追加到 <code>segments[]</code>，再由人工复核和编辑。</p>
+              <h3>编辑几何</h3>
+              <p>点击“编辑几何”后，可以点击已有目标框或分割区域。拖拽框体可移动目标框，拖拽角点可调整大小；拖拽多边形顶点可修改区域边界，拖拽区域内部可整体移动区域。</p>
               <h3>添加目标框</h3>
               <p>该按钮会在当前图像中心新增一个默认框，宽约原图 18%、高约原图 14%，类别取工具栏输入框。它适合快速放置一个可编辑框；如果要按真实位置画框，请使用“人工画框”。</p>
               <h3>复核字段</h3>
@@ -759,7 +1028,7 @@ deploy/DOMAIN_DEPLOYMENT.md</pre>
               <h3>为什么旧图一打开有框？</h3>
               <p>早期版本曾自动生成示例预标注。已写入的旧框不会自动删除，避免误删复核数据；可用“清除所有”后保存。</p>
               <h3>框坐标是原图坐标吗？</h3>
-              <p>是。前端可能缩放显示大图，但保存和导出的 bbox 均为原图坐标。</p>
+              <p>是。前端可能缩放显示大图，但保存和导出的 bbox、旋转框角度和多边形点位均按原图坐标记录。</p>
             </section>
 
             <section id="guide-workflow">
@@ -780,6 +1049,6 @@ deploy/DOMAIN_DEPLOYMENT.md</pre>
       </section>
     </main>
 
-    <script src="/static/app.js?v=20260520_uaiv_labeler"></script>
+    <script src="/static/app.js?v=20260610_admin_list_home2"></script>
   </body>
 </html>
