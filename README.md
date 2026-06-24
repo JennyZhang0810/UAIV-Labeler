@@ -18,7 +18,9 @@ UAIV-Labeler is the official annotation platform for UAIV-style datasets. It is 
 ## Links
 
 - Live demo: http://8.137.184.86
+- Public project page: https://jennyzhang0810.github.io/UAIV-Labeler/
 - GitHub repository: https://github.com/JennyZhang0810/UAIV-Labeler
+- UAIV DataHub: https://jennyzhang0810.github.io/UAIV-DataHub/
 - UAIV dataset project: https://jennyzhang0810.github.io/LowAltitude-Multimodal-Dataset/
 
 ## Choose a Run Mode
@@ -36,13 +38,19 @@ The offline demo is intentionally lightweight. It is not the same as the planned
 ## Highlights
 
 - **Low-altitude remote-sensing first**: batch, altitude, GPS, weather, scene, source, and task Metadata are built into the annotation flow.
+- **Metadata backfill**: administrators can backfill altitude, GPS, capture time, weather, and scene from EXIF/GPS and path context without overwriting valid fields.
 - **No large Web upload required**: server-folder import stores image paths and Metadata indexes instead of duplicating massive UAV datasets.
 - **SQLite side index**: portable JSON remains the source of truth, while `data/index.sqlite3` provides a rebuildable index for faster filtering, status summaries, and future team workflows.
 - **Multi-task workflow**: object detection, segmentation, OCR, event QA, restoration-pair annotation, and structure understanding can be reviewed in one workspace.
+- **Role-aware production UI**: switch between annotator, reviewer, admin, and model-operator modes so daily labeling stays simple while advanced import/model/export tools remain available.
+- **Thumbnail task queue**: image lists can show cached thumbnails, status pills, and task tags for faster production review.
+- **Scored risk queue**: quality-control queues rank samples by weighted risk score so reviewers can handle missing annotations, rejected samples, and draft-only records first.
+- **Task template library**: reusable import templates define default tasks, required fields, prefill fields, QA checks, and export formats for common low-altitude workflows.
+- **Production reports**: export JSON, Markdown, and HTML reports summarizing review progress, metadata coverage, risk scores, and group-level production status.
 - **Manual geometry tools**: supports horizontal boxes, rotated boxes, and point-by-point polygon regions for remote-sensing objects and areas.
 - **Model-assisted annotation**: connect YOLO, SegEarth, SAM-style services, OCR, VLMs, or custom HTTP model backends.
 - **QA and Benchmark ready**: review TSV QA files, inspect XLSX model results, and export JSON, COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, Mask PNG, or QA JSONL.
-- **Quality control utilities**: generate a metadata/path confidence report and a Markdown Dataset Card for release notes, dataset papers, and project pages.
+- **Quality control utilities**: generate a metadata/path confidence report, Dataset Card, and production report for release notes, dataset papers, and project pages.
 - **GitHub-friendly demo data**: includes a tiny runnable sample dataset so users can try the platform immediately.
 - **Offline-friendly entry point**: includes a local-only demo for manual annotation and workflow review without exposing a public server.
 
@@ -107,16 +115,19 @@ This platform is intended as a companion tool for scaling UAIV-style Metadata-fi
 
 - **2024-2025**: UAIV dataset construction and first public dataset release.
 - **2026.05**: UAIV-Labeler initial public release with Metadata-first indexing, manual bbox review, QA review, export formats, Docker startup, sample data, and a local offline demo.
-- **Next**: full offline package for intranet or no-internet environments, improved segmentation workflow, stronger model backend examples, and more task templates.
+- **2026.06**: production-oriented upgrade with role-aware workspace modes, thumbnail task queue, rule/model draft tracking, scored risk queue, task templates, production reports, QA review, and public ECS demo deployment.
+- **Next**: full offline package, stronger model backend examples, richer collaboration support, and production report screenshots.
 
 ## Roadmap
 
 - **Offline full package**: provide a self-contained offline bundle for internal networks, no-internet labs, and secure government/enterprise environments. The current repository already includes a lightweight offline demo.
-- **Task templates**: add configurable templates for fire/smoke monitoring, illegal dumping, water pollution, construction activity, traffic congestion, illegal parking, vegetation damage, farmland/wetland monitoring, and restoration severity grading.
+- **Task templates**: expand the current configurable template library with fire/smoke monitoring, illegal dumping, water pollution, construction activity, traffic congestion, illegal parking, vegetation damage, farmland/wetland monitoring, and restoration severity grading.
+- **Thumbnail task queue**: continue improving the current thumbnail list with richer state colors and batch actions.
+- **Production report**: continue enriching the current JSON/Markdown/HTML report with screenshots, QA accuracy summaries, and release checklist links.
 - **Interactive segmentation**: integrate click/box prompt segmentation through SAM/SAM2/SAM3-style services.
 - **Large image support**: improve tiled viewing for large UAV mosaics and GeoTIFF-style imagery.
 - **Dataset Card generator**: automatically summarize scenes, weather, altitude, tasks, review status, and export statistics.
-- **Collaboration support**: move from JSON files to SQLite/PostgreSQL for multi-user review and audit trails.
+- **Collaboration support**: extend the current lightweight role modes into login-backed permissions, reviewer assignment, SQLite/PostgreSQL workflows, and audit trails.
 - **Community task support**: if you need a specific UAV or remote-sensing labeling workflow, please open an issue or contact the maintainer.
 
 Contact:
