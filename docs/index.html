@@ -3,67 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="UAIV-Labeler is an open-source data production and annotation platform for low-altitude remote-sensing datasets.">
-  <title>UAIV-Labeler | Data Production Platform for Low-altitude Remote Sensing</title>
+  <meta name="description" content="UAIV-Labeler：面向低空遥感与城市治理数据生产的多任务标注工作台。">
+  <title>UAIV-Labeler | Low-altitude Data Production Workbench</title>
   <style>
     :root {
-      --ink: #111827;
-      --muted: #5f6673;
-      --line: #e5e7eb;
-      --paper: #ffffff;
-      --soft: #f7f8fb;
-      --accent: #ff4f3f;
-      --accent-dark: #d93428;
-      --green: #12a182;
-      --gold: #d7971d;
-      --violet: #6956d8;
-      --shadow: 0 22px 70px rgba(17, 24, 39, 0.12);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "Noto Sans", sans-serif;
-      color: var(--ink);
-      background: var(--paper);
+      --ink: #17222d;
+      --muted: #5e6974;
+      --line: #dbe4ea;
+      --paper: #f5f7fa;
+      --white: #ffffff;
+      --navy: #172f45;
+      --blue: #2f618f;
+      --teal: #177b7f;
+      --green: #2b7352;
+      --amber: #b47915;
+      --red: #c9483c;
+      --shadow: 0 20px 50px rgba(16, 31, 43, 0.08);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background: linear-gradient(180deg, #fff 0%, #fbfbfd 44%, #fff 100%);
       color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.62;
       letter-spacing: 0;
     }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { display: block; max-width: 100%; }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      display: block;
-      max-width: 100%;
-    }
-
-    .shell {
-      width: min(1180px, calc(100% - 40px));
-      margin: 0 auto;
-    }
-
-    .nav {
+    .topbar {
       position: sticky;
       top: 0;
       z-index: 20;
-      border-bottom: 1px solid rgba(229, 231, 235, 0.82);
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(219,228,234,0.92);
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
     }
 
-    .nav-inner {
+    .topbar-inner,
+    .section-inner,
+    .hero-inner,
+    .footer-inner {
+      width: min(1220px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 70px;
-      gap: 24px;
+      min-height: 64px;
+      gap: 16px;
     }
 
     .brand {
@@ -71,34 +65,105 @@
       align-items: center;
       gap: 12px;
       font-weight: 800;
-      font-size: 19px;
       white-space: nowrap;
     }
 
-    .mark {
-      width: 34px;
-      height: 34px;
+    .brand-mark {
+      width: 30px;
+      height: 30px;
       border-radius: 8px;
+      background: linear-gradient(135deg, var(--red), var(--navy));
+      color: #fff;
       display: grid;
       place-items: center;
-      background: var(--ink);
-      color: #fff;
-      font-size: 13px;
-      letter-spacing: 0;
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .nav-links {
+    .nav {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
       justify-content: flex-end;
-      gap: 22px;
-      color: var(--muted);
       font-size: 14px;
+    }
+
+    .nav a {
+      color: var(--muted);
       font-weight: 650;
     }
 
-    .nav-links a:hover {
-      color: var(--ink);
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background:
+        linear-gradient(rgba(11, 23, 31, 0.76), rgba(11, 23, 31, 0.60)),
+        linear-gradient(135deg, #172f45 0%, #233f59 46%, #1f3548 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(201,72,60,0.22), transparent 24%),
+        radial-gradient(circle at 86% 14%, rgba(23,123,127,0.18), transparent 24%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(430px, 1.08fr);
+      gap: 34px;
+      align-items: center;
+      min-height: calc(100vh - 64px);
+      padding: 84px 0 96px;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      min-height: 32px;
+      margin-bottom: 18px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.86);
+      font-size: 13px;
+      font-weight: 720;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #7de2ce;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(48px, 7vw, 84px);
+      line-height: 0.98;
+    }
+
+    .hero-copy {
+      max-width: 700px;
+      margin: 0;
+      color: rgba(255,255,255,0.88);
+      font-size: 20px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
     }
 
     .button {
@@ -106,787 +171,198 @@
       align-items: center;
       justify-content: center;
       min-height: 44px;
-      padding: 0 18px;
+      padding: 0 16px;
+      border: 1px solid rgba(255,255,255,0.24);
       border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      font-weight: 750;
+      background: rgba(255,255,255,0.10);
+      color: #fff;
       font-size: 14px;
-      box-shadow: 0 1px 0 rgba(17, 24, 39, 0.04);
+      font-weight: 760;
     }
 
     .button.primary {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
+      border-color: #fff;
+      background: #fff;
+      color: var(--ink);
     }
 
-    .button.primary:hover {
-      background: var(--accent-dark);
-      border-color: var(--accent-dark);
-    }
-
-    .hero {
-      padding: 78px 0 36px;
-    }
-
-    .hero-grid {
+    .hero-metrics {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(430px, 1.08fr);
-      align-items: center;
-      gap: 46px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      width: min(820px, 100%);
+      margin-top: 34px;
+    }
+
+    .hero-metric {
+      padding: 16px 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.10);
+    }
+
+    .hero-metric strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .hero-metric span {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255,255,255,0.76);
+      font-size: 13px;
+    }
+
+    .hero-shot {
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 22px 58px rgba(0,0,0,0.22);
+    }
+
+    .hero-shot img {
+      width: 100%;
+      aspect-ratio: 1312 / 816;
+      object-fit: cover;
+    }
+
+    .hero-shot .caption {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.82);
+      font-size: 14px;
+    }
+
+    .section {
+      padding: 58px 0;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.16;
+    }
+
+    .section-copy {
+      max-width: 860px;
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 16px;
     }
 
     .eyebrow {
       display: inline-flex;
+      min-height: 24px;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
+      padding: 2px 8px;
       border-radius: 999px;
-      color: #4b5563;
-      background: #fff;
-      font-size: 13px;
-      font-weight: 750;
+      background: #fff0ee;
+      color: #b4382c;
+      font-size: 12px;
+      font-weight: 780;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--green);
-    }
-
-    h1 {
-      margin: 0;
-      max-width: 680px;
-      font-size: clamp(52px, 6.8vw, 84px);
-      line-height: 0.94;
-      letter-spacing: 0;
-    }
-
-    .lead {
-      margin: 26px 0 0;
-      max-width: 620px;
-      color: #3f4652;
-      font-size: 19px;
-      line-height: 1.72;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 30px;
-    }
-
-    .stats {
+    .grid-4,
+    .grid-3,
+    .grid-2 {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 34px;
-      max-width: 620px;
+      gap: 16px;
     }
 
-    .stat {
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
-    }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-    .stat strong {
-      display: block;
-      font-size: 25px;
-      line-height: 1;
-    }
-
-    .stat span {
-      display: block;
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .hero-code {
-      margin-top: 22px;
-      max-width: 620px;
+    .card,
+    .panel,
+    .screen-card {
+      border: 1px solid var(--line);
       border-radius: 8px;
-      border: 1px solid #252a36;
-      background: #111827;
-      color: #e5e7eb;
-      box-shadow: 0 16px 44px rgba(17, 24, 39, 0.12);
-    }
-
-    .hero-code pre {
-      padding: 16px 18px;
-      font-size: 13px;
-      line-height: 1.58;
-    }
-
-    .product-shot {
-      position: relative;
-    }
-
-    .product-frame {
-      overflow: hidden;
-      border-radius: 8px;
-      border: 1px solid #dfe3ea;
-      background: #fff;
+      background: var(--white);
       box-shadow: var(--shadow);
     }
 
-    .product-frame img {
-      width: 100%;
-      aspect-ratio: 1312 / 816;
-      object-fit: cover;
+    .card {
+      padding: 20px;
     }
 
-    .demo-frame img {
-      aspect-ratio: 960 / 560;
-      object-fit: contain;
-      background: #101827;
-    }
-
-    .floating-note {
-      margin-top: 12px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 12px 34px rgba(17, 24, 39, 0.08);
-      font-size: 14px;
-      line-height: 1.55;
-      color: #303744;
-    }
-
-    section {
-      padding: 78px 0;
-    }
-
-    .section-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 28px;
-      margin-bottom: 30px;
-    }
-
-    .section-head h2 {
-      margin: 0;
-      max-width: 760px;
-      font-size: clamp(32px, 4.5vw, 54px);
-      line-height: 1.02;
-      letter-spacing: 0;
-    }
-
-    .section-head p {
-      margin: 0;
-      max-width: 440px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.72;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .feature {
-      min-height: 230px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 22px;
-      background: #fff;
-    }
-
-    .icon {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: 850;
-      margin-bottom: 22px;
-    }
-
-    .feature:nth-child(1) .icon { background: var(--accent); }
-    .feature:nth-child(2) .icon { background: var(--green); }
-    .feature:nth-child(3) .icon { background: var(--violet); }
-    .feature:nth-child(4) .icon { background: var(--gold); }
-
-    .feature h3 {
+    .card h3 {
       margin: 0 0 10px;
-      font-size: 19px;
-      letter-spacing: 0;
-    }
-
-    .feature p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.68;
-      font-size: 15px;
-    }
-
-    .showcase {
-      background: var(--soft);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .showcase-grid {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 22px;
-      align-items: stretch;
-    }
-
-    .showcase-stack {
-      display: grid;
-      gap: 22px;
-    }
-
-    .showcase-copy {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .showcase-copy h2 {
-      margin: 0;
-      font-size: clamp(30px, 4vw, 50px);
-      line-height: 1.04;
-    }
-
-    .showcase-copy p {
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.76;
-    }
-
-    .check-list {
-      display: grid;
-      gap: 14px;
-      margin-top: 16px;
-    }
-
-    .check {
-      display: grid;
-      grid-template-columns: 22px 1fr;
-      gap: 10px;
-      color: #303744;
-      font-size: 15px;
-      line-height: 1.55;
-    }
-
-    .check::before {
-      content: "";
-      width: 18px;
-      height: 18px;
-      margin-top: 2px;
-      border-radius: 999px;
-      background: radial-gradient(circle at center, var(--accent) 0 35%, #ffe1dd 38% 100%);
-    }
-
-    .tabs {
-      display: grid;
-      gap: 16px;
-    }
-
-    .tabs .screen {
-      background: #101827;
-      border-color: #1f2937;
-      box-shadow: 0 18px 48px rgba(17, 24, 39, 0.18);
-    }
-
-    .tabs .screen img {
-      padding: 10px;
-      background: #101827;
-      object-fit: contain;
-    }
-
-    .screen {
-      overflow: hidden;
-      border: 1px solid #dfe3ea;
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 14px 40px rgba(17, 24, 39, 0.08);
-    }
-
-    .screen img {
-      width: 100%;
-      aspect-ratio: 1312 / 816;
-      object-fit: cover;
-    }
-
-    .screen-caption {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 650;
-    }
-
-    .interface-points {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .interface-point {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .interface-point strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 17px;
-    }
-
-    .interface-point span {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .workflow-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .step {
-      position: relative;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      padding: 24px;
-      min-height: 245px;
-    }
-
-    .step-number {
-      color: var(--accent);
-      font-weight: 850;
-      font-size: 14px;
-      margin-bottom: 34px;
-    }
-
-    .step h3 {
-      margin: 0 0 12px;
-      font-size: 22px;
-    }
-
-    .step p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.68;
-    }
-
-    .code-panel {
-      overflow: hidden;
-      border-radius: 8px;
-      border: 1px solid #252a36;
-      background: #111827;
-      color: #d1d5db;
-      box-shadow: var(--shadow);
-    }
-
-    .code-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 16px;
-      border-bottom: 1px solid #263041;
-      color: #f9fafb;
-      font-weight: 750;
-      font-size: 14px;
-    }
-
-    pre {
-      margin: 0;
-      padding: 22px;
-      overflow-x: auto;
-      font: 14px/1.7 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      white-space: pre;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 0.92fr 1.08fr;
-      gap: 28px;
-      align-items: center;
-    }
-
-    .mode-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .mode {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      padding: 22px;
-      min-height: 210px;
-    }
-
-    .mode strong {
-      display: block;
       font-size: 20px;
-      margin-bottom: 12px;
     }
 
-    .mode p {
+    .card p,
+    .card li {
       margin: 0;
       color: var(--muted);
-      line-height: 1.65;
+      font-size: 14px;
     }
 
-    .task-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
+    .list {
+      margin: 12px 0 0;
+      padding-left: 18px;
     }
 
-    .task {
-      min-height: 150px;
+    .panel {
+      overflow: hidden;
+    }
+
+    .panel img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: #eef3f7;
+    }
+
+    .panel .body {
       padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
     }
 
-    .task strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 17px;
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
     }
 
-    .task span {
+    .panel p {
+      margin: 0;
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.55;
     }
 
-    .compare-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 14px 40px rgba(17, 24, 39, 0.06);
-    }
-
-    .compare-table {
+    table {
       width: 100%;
-      min-width: 760px;
       border-collapse: collapse;
-      text-align: left;
-      font-size: 15px;
     }
 
-    .compare-table th,
-    .compare-table td {
-      padding: 17px 18px;
+    th,
+    td {
+      padding: 13px 14px;
       border-bottom: 1px solid var(--line);
-    }
-
-    .compare-table th {
-      background: #f9fafb;
-      color: #374151;
+      text-align: left;
+      vertical-align: top;
       font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0;
     }
 
-    .compare-table tr:last-child td {
+    th {
+      color: var(--muted);
+      background: #eef3f7;
+      font-weight: 780;
+    }
+
+    tr:last-child td {
       border-bottom: 0;
     }
 
-    .yes {
-      color: var(--green);
-      font-weight: 850;
-    }
-
-    .no {
-      color: #9ca3af;
-      font-weight: 850;
-    }
-
-    .partial {
-      color: var(--gold);
-      font-weight: 850;
-    }
-
-    .project-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .project {
-      min-height: 160px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .project small {
-      display: block;
-      color: var(--accent);
-      font-weight: 800;
-      margin-bottom: 24px;
-    }
-
-    .project strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .project span {
-      color: var(--muted);
-      line-height: 1.58;
-      font-size: 14px;
-    }
-
-    .architecture {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .arch-node {
-      position: relative;
-      min-height: 180px;
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .arch-node::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      right: -17px;
-      width: 18px;
-      height: 2px;
-      background: #cbd5e1;
-    }
-
-    .arch-node:last-child::after {
-      display: none;
-    }
-
-    .arch-node strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-
-    .arch-node p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.62;
-      font-size: 14px;
-    }
-
-    .flow-figure {
-      overflow: hidden;
-      border: 1px solid #dfe3ea;
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: var(--shadow);
-    }
-
-    .flow-figure img {
-      width: 100%;
-      aspect-ratio: 1376 / 768;
-      object-fit: contain;
-      background: #fff;
-    }
-
-    .flow-caption {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-      padding: 14px 18px;
+    .band {
+      background: #eef4f7;
       border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .flow-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .flow-tags span {
-      padding: 5px 8px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: #f9fafb;
-      color: #4b5563;
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .roadmap-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .roadmap-item {
-      min-height: 168px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .roadmap-item.done {
-      border-color: rgba(18, 161, 130, 0.34);
-      background: #f3fffb;
-    }
-
-    .roadmap-item.next {
-      border-color: rgba(255, 79, 63, 0.28);
-      background: #fff8f7;
-    }
-
-    .roadmap-item small {
-      display: block;
-      margin-bottom: 22px;
-      font-weight: 850;
-      color: var(--muted);
-    }
-
-    .roadmap-item.done small {
-      color: var(--green);
-    }
-
-    .roadmap-item.next small {
-      color: var(--accent);
-    }
-
-    .roadmap-item strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 19px;
-    }
-
-    .roadmap-item span {
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 14px;
-    }
-
-    .publication-list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .publication {
-      display: grid;
-      grid-template-columns: 150px 1fr;
-      gap: 18px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .publication small {
-      color: var(--accent);
-      font-weight: 850;
-    }
-
-    .publication strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 18px;
-    }
-
-    .publication span {
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 14px;
-    }
-
-    .cta {
-      padding: 72px 0 88px;
-      background: #111827;
-      color: #fff;
-    }
-
-    .cta-inner {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 30px;
-      align-items: center;
-    }
-
-    .cta h2 {
-      margin: 0 0 16px;
-      font-size: clamp(32px, 4vw, 52px);
-      line-height: 1.05;
-    }
-
-    .cta p {
-      margin: 0;
-      max-width: 720px;
-      color: #cbd5e1;
-      font-size: 17px;
-      line-height: 1.72;
-    }
-
-    .cta-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .cta .button {
-      border-color: rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
-
-    .cta .button.primary {
-      background: var(--accent);
-      border-color: var(--accent);
+      border-bottom: 1px solid var(--line);
     }
 
     footer {
       border-top: 1px solid var(--line);
-      padding: 28px 0;
-      color: var(--muted);
-      font-size: 14px;
       background: #fff;
     }
 
@@ -894,255 +370,214 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
+      gap: 16px;
+      padding: 24px 0 34px;
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .footer-links {
       display: flex;
-      gap: 16px;
       flex-wrap: wrap;
+      gap: 14px;
+      justify-content: flex-end;
     }
 
-    @media (max-width: 980px) {
-      .nav-links a:not(.button) {
-        display: none;
+    @media (max-width: 1080px) {
+      .hero-inner,
+      .hero-metrics,
+      .grid-4,
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .hero-grid,
-      .showcase-grid,
-      .two-col,
-      .cta-inner {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner,
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav,
+      .footer-links {
+        justify-content: flex-start;
+      }
+
+      .hero-inner,
+      .hero-metrics,
+      .grid-4,
+      .grid-3 {
         grid-template-columns: 1fr;
       }
 
-      .feature-grid,
-      .workflow-grid,
-      .mode-grid,
-      .task-grid,
-      .interface-points,
-      .project-grid,
-      .architecture,
-      .roadmap-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .arch-node::after {
-        display: none;
-      }
-
-      .section-head {
-        display: block;
-      }
-
-      .section-head p {
-        margin-top: 18px;
-      }
-
-      .cta-actions {
-        justify-content: flex-start;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .shell {
-        width: min(100% - 28px, 1180px);
-      }
-
-      .nav-inner {
-        min-height: 64px;
-      }
-
-      .brand {
-        font-size: 17px;
-      }
-
-      .nav-links .button {
-        min-height: 38px;
-        padding: 0 12px;
-      }
-
-      .hero {
-        padding-top: 52px;
+      .hero-inner {
+        min-height: auto;
+        padding: 60px 0 88px;
       }
 
       h1 {
-        font-size: 46px;
+        font-size: 42px;
       }
 
-      .lead {
+      .hero-copy {
         font-size: 17px;
       }
 
-      .stats,
-      .feature-grid,
-      .workflow-grid,
-      .mode-grid,
-      .task-grid,
-      .interface-points,
-      .project-grid,
-      .architecture,
-      .roadmap-grid,
-      .publication {
-        grid-template-columns: 1fr;
-      }
-
-      section {
-        padding: 58px 0;
-      }
-
-      .showcase-copy {
-        padding: 22px;
+      .section {
+        padding: 44px 0;
       }
     }
   </style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="shell nav-inner">
-      <a class="brand" href="#">
-        <span class="mark">UA</span>
-        <span>UAIV-Labeler</span>
-      </a>
-      <div class="nav-links">
-        <a href="#tasks">Tasks</a>
-        <a href="#compare">Why UAIV</a>
-        <a href="#install">Install</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
-        <a class="button primary" href="http://8.137.184.86">Live Demo</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">UL</span>UAIV-Labeler</div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#why">定位</a>
+        <a href="#features">能力</a>
+        <a href="#screens">界面</a>
+        <a href="#modes">使用方式</a>
+        <a href="#links">入口</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="hero-kicker">Low-altitude data production workbench</span>
+        <h1>不是通用标注工具的另一个壳，而是面向低空数据生产的工作台。</h1>
+        <p class="hero-copy">UAIV-Labeler 连接多任务标注、Metadata 管理、模型预标注、人工复核、风险队列和 benchmark-ready 导出。它服务的不是单一 box 标注，而是一整条低空数据集生产流程。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="http://8.137.184.86/">打开在线演示</a>
+          <a class="button" href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
+          <a class="button" href="../README_zh.md">中文文档</a>
+        </div>
+        <div class="hero-metrics">
+          <div class="hero-metric"><strong>Multi-task</strong><span>detection, OCR, event QA, metadata review</span></div>
+          <div class="hero-metric"><strong>Role-aware</strong><span>annotator, reviewer, admin, model operator</span></div>
+          <div class="hero-metric"><strong>AI-ready</strong><span>task-wise export, QA and benchmark packaging</span></div>
+          <div class="hero-metric"><strong>Live</strong><span>public preview and local/server deployment modes</span></div>
+        </div>
+      </div>
+      <div class="hero-shot">
+        <img src="site-assets/workbench.png" alt="UAIV-Labeler workbench screenshot">
+        <div class="caption">当前公开页展示的是已经用于真实低空城市治理标注生产的工作台，而不是概念模型图。</div>
       </div>
     </div>
-  </nav>
+  </section>
 
   <main>
-    <header class="hero">
-      <div class="shell hero-grid">
-        <div>
-          <div class="eyebrow"><span class="dot"></span> Open-source data production platform for aerial observation datasets</div>
-          <h1>UAIV-Labeler</h1>
-          <p class="lead">
-            Build low-altitude remote-sensing datasets beyond boxes. UAIV-Labeler combines detection, oriented boxes, polygons, event QA, OCR/VLM review, metadata indexing, model pre-annotation, and benchmark export in one workflow.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="http://8.137.184.86">Live Demo</a>
-            <a class="button" href="#install">Install</a>
-            <a class="button" href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
-          </div>
-          <div class="stats">
-            <div class="stat">
-              <strong>50+</strong>
-              <span>metadata fields for flight, scene, task, and review context</span>
-            </div>
-            <div class="stat">
-              <strong>8+</strong>
-              <span>export formats for training and benchmark</span>
-            </div>
-            <div class="stat">
-              <strong>10+</strong>
-              <span>annotation and multimodal review task types</span>
-            </div>
-          </div>
-          <div id="install" class="hero-code">
-            <pre><code>git clone https://github.com/JennyZhang0810/UAIV-Labeler.git
-cd UAIV-Labeler
-pip install -r requirements.txt
-bash offline_demo/run_offline.sh</code></pre>
-          </div>
-        </div>
-        <div class="product-shot">
-          <div class="product-frame demo-frame">
-            <img src="site-assets/sample-preview.gif" alt="UAIV-Labeler demo workflow animation">
-          </div>
-          <div class="floating-note">
-            Import drone-collected imagery, run pre-annotation, revise boxes or regions, review QA, then export benchmark-ready files.
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <section id="tasks">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Supported Tasks</h2>
-          <p>UAIV-Labeler is built for multi-task aerial observation data construction, not only object detection.</p>
-        </div>
-        <div class="task-grid">
-          <article class="task">
-            <strong>Detection</strong>
-            <span>Horizontal bounding boxes for common aerial-view objects and events.</span>
+    <section class="section" id="why">
+      <div class="section-inner">
+        <h2 class="section-title">为什么它不是一个普通标注页</h2>
+        <p class="section-copy">CVAT 和 Label Studio 解决的是通用标注问题。UAIV-Labeler 解决的是低空遥感数据生产问题：图像来自服务器目录、任务是多任务混合、Metadata 是生产入口、标注之后还要走 QA、发布和 benchmark export。</p>
+        <div class="grid-4">
+          <article class="card">
+            <span class="eyebrow">Metadata-first</span>
+            <h3>数据管理先于画框</h3>
+            <p>飞行批次、天气、场景、来源路径、飞行高度和质量状态不是附属信息，而是工作流中心。</p>
           </article>
-          <article class="task">
-            <strong>Oriented Detection</strong>
-            <span>Rotated boxes for aerial-view objects with arbitrary direction.</span>
+          <article class="card">
+            <span class="eyebrow">Multi-task</span>
+            <h3>不只检测</h3>
+            <p>同一工作台内支持 object grounding、OCR、事件 QA、场景与环境状态等多类标注任务。</p>
           </article>
-          <article class="task">
-            <strong>Segmentation</strong>
-            <span>Polygon and mask-oriented review for area-level annotations.</span>
+          <article class="card">
+            <span class="eyebrow">Production</span>
+            <h3>面向真实生产</h3>
+            <p>支持批次组织、角色模式、风险队列、草稿状态、批量导出和多轮复核，而不是单次 demo。</p>
           </article>
-          <article class="task">
-            <strong>Event QA</strong>
-            <span>Question review for urban governance and multimodal reasoning.</span>
-          </article>
-          <article class="task">
-            <strong>OCR / VLM</strong>
-            <span>Inspect OCR, VLM, and model answers next to image evidence.</span>
-          </article>
-          <article class="task">
-            <strong>Restoration Pair</strong>
-            <span>Pair and inspect degraded/restored low-altitude images for restoration tasks.</span>
+          <article class="card">
+            <span class="eyebrow">Release-ready</span>
+            <h3>导出不是终点</h3>
+            <p>平台导出的结构要能进入后续 QA、Foundry、dataset packaging 和 benchmark 流程。</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section id="compare" class="showcase">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Why UAIV-Labeler?</h2>
-          <p>CVAT and Label Studio are excellent general tools. UAIV-Labeler focuses on low-altitude remote-sensing dataset production where metadata, event QA, model-assisted review, and benchmark export are native parts of the same workflow.</p>
+    <section class="section band" id="features">
+      <div class="section-inner">
+        <h2 class="section-title">当前最值得看的不是功能清单，而是已经成型的四个工作面。</h2>
+        <p class="section-copy">这些都直接来自你仓库里现成截图，而不是额外构造的宣传图。</p>
+        <div class="grid-2">
+          <article class="panel">
+            <img src="site-assets/workbench.png" alt="Workbench screenshot">
+            <div class="body">
+              <h3>标注工作面</h3>
+              <p>围绕图像列表、任务工具、右侧属性面板和保存逻辑展开，适合真实多人生产，而不是单一图片 demo。</p>
+            </div>
+          </article>
+          <article class="panel">
+            <img src="site-assets/qa-review.png" alt="QA review screenshot">
+            <div class="body">
+              <h3>QA 与复核工作面</h3>
+              <p>风险队列、状态区分和复核流程明确可见，强调“生产后复核”而不是一次性标完即结束。</p>
+            </div>
+          </article>
+          <article class="panel">
+            <img src="site-assets/metadata.png" alt="Metadata management screenshot">
+            <div class="body">
+              <h3>Metadata 管理工作面</h3>
+              <p>支持 altitude、scene、weather、source path 等信息进入数据生产主流程，适配低空数据的真实组织方式。</p>
+            </div>
+          </article>
+          <article class="panel">
+            <img src="site-assets/model-integration.png" alt="Model integration screenshot">
+            <div class="body">
+              <h3>模型辅助工作面</h3>
+              <p>平台不是只做人工操作，也包含 model pre-annotation、SAM-style segmentation、OCR 与自定义 backend 接口。</p>
+            </div>
+          </article>
         </div>
-        <div class="compare-wrap">
-          <table class="compare-table" aria-label="UAIV-Labeler comparison with CVAT and Label Studio">
+      </div>
+    </section>
+
+    <section class="section" id="screens">
+      <div class="section-inner">
+        <h2 class="section-title">一个页面看懂当前平台最成熟的界面能力</h2>
+        <p class="section-copy">如果观众只停留一分钟，下面这张表就足够解释平台已经具备哪些和低空数据生产直接相关的能力。</p>
+        <div class="panel">
+          <table>
             <thead>
               <tr>
-                <th>Capability</th>
-                <th>CVAT</th>
-                <th>Label Studio</th>
-                <th>UAIV-Labeler</th>
+                <th>界面能力</th>
+                <th>当前状态</th>
+                <th>说明</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Aerial metadata workflow</td>
-                <td class="partial">Limited</td>
-                <td class="partial">Limited</td>
-                <td class="yes">Native</td>
+                <td><strong>Role-aware workspace</strong></td>
+                <td>ready</td>
+                <td>按 annotator / reviewer / admin / model operator 区分工作界面，减少多人生产时的干扰项。</td>
               </tr>
               <tr>
-                <td>Oriented bounding boxes</td>
-                <td class="yes">Native</td>
-                <td class="partial">Partial</td>
-                <td class="yes">Native</td>
+                <td><strong>Multi-task annotation</strong></td>
+                <td>ready</td>
+                <td>支持 detection、rotated box、polygon、OCR、event QA 和 image-level metadata review。</td>
               </tr>
               <tr>
-                <td>Event QA review</td>
-                <td class="partial">External</td>
-                <td class="partial">External</td>
-                <td class="yes">Native</td>
+                <td><strong>Risk queue and review flow</strong></td>
+                <td>ready</td>
+                <td>可按风险优先级组织复核工作，而不只是遍历式检查。</td>
               </tr>
               <tr>
-                <td>Benchmark export</td>
-                <td class="partial">Partial</td>
-                <td class="partial">Partial</td>
-                <td class="yes">Native</td>
+                <td><strong>Model-assisted pre-annotation</strong></td>
+                <td>ready</td>
+                <td>支持 YOLO、SegEarth、SAM-style backends 和自定义 HTTP 模型接口。</td>
               </tr>
               <tr>
-                <td>Multi-task remote-sensing workflow</td>
-                <td class="partial">External</td>
-                <td class="partial">External</td>
-                <td class="yes">Native</td>
+                <td><strong>Benchmark-ready export</strong></td>
+                <td>ready</td>
+                <td>导出格式面向后续训练、QA 和 benchmark packaging，而不是仅供页面展示。</td>
               </tr>
             </tbody>
           </table>
@@ -1150,301 +585,75 @@ bash offline_demo/run_offline.sh</code></pre>
       </div>
     </section>
 
-    <section id="features">
-      <div class="shell">
-        <div class="section-head">
-          <h2>From import to review to export, without leaving the workspace.</h2>
-          <p>Designed for labs building low-altitude imagery datasets for urban governance, ecology, agriculture, restoration, and multimodal foundation-model benchmarks.</p>
-        </div>
-        <div class="feature-grid">
-          <article class="feature">
-            <div class="icon">M</div>
-            <h3>Metadata-first</h3>
-            <p>Batch, altitude, GPS, weather, scene, source, and task metadata stay visible during annotation and export.</p>
+    <section class="section" id="modes">
+      <div class="section-inner">
+        <h2 class="section-title">三种使用方式已经足够覆盖会议演示、课堂体验和实验室生产。</h2>
+        <p class="section-copy">这一点现在应该讲得非常清楚：离线 demo、在线预览和服务器部署是三种不同的模式，而不是一个模糊的“都能用”。</p>
+        <div class="grid-3">
+          <article class="card">
+            <span class="eyebrow">Offline Demo</span>
+            <h3>本地试用</h3>
+            <p>用于课堂演示、无公网环境或快速体验。默认使用 `sample_data/`，不依赖公网服务。</p>
+            <ul class="list">
+              <li>`offline_demo/run_offline.sh`</li>
+              <li>`127.0.0.1:7860`</li>
+            </ul>
           </article>
-          <article class="feature">
-            <div class="icon">AI</div>
-            <h3>Model-assisted</h3>
-            <p>Connect YOLO, SegEarth, SAM-style services, OCR, VLMs, or custom HTTP backends for pre-annotation.</p>
+          <article class="card">
+            <span class="eyebrow">Online Demo</span>
+            <h3>公开预览</h3>
+            <p>用于外部访问和会议展示。它展示已经部署好的平台，但不会读取访客本地磁盘。</p>
+            <ul class="list">
+              <li>`http://8.137.184.86/`</li>
+              <li>public preview only</li>
+            </ul>
           </article>
-          <article class="feature">
-            <div class="icon">QA</div>
-            <h3>QA review</h3>
-            <p>Review TSV QA files, XLSX model results, paired images, ground truth answers, and reasoning traces.</p>
-          </article>
-          <article class="feature">
-            <div class="icon">EX</div>
-            <h3>Benchmark export</h3>
-            <p>Export JSON, COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, Mask PNG, and QA JSONL.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="showcase">
-      <div class="shell showcase-stack">
-        <div class="section-head">
-          <div>
-            <h2>One workbench for annotation, model review, and QA.</h2>
-            <p>Annotators can switch between boxes, oriented boxes, polygons, and QA review. Dataset builders can organize image sources, model backends, metadata, and export formats without gluing multiple tools together.</p>
-          </div>
-        </div>
-        <figure class="screen">
-          <img src="site-assets/workbench.png" alt="UAIV-Labeler annotation workbench screenshot">
-          <figcaption class="screen-caption">
-            <span>Annotation Workbench</span>
-            <span>Box / OBB / Polygon / QA / Export</span>
-          </figcaption>
-        </figure>
-        <div class="interface-points">
-          <article class="interface-point">
-            <strong>Server-folder indexing</strong>
-            <span>Index large image collections without copying original data into the web app.</span>
-          </article>
-          <article class="interface-point">
-            <strong>Model-assisted review</strong>
-            <span>Send images and metadata to YOLO, SegEarth, SAM-style, OCR/VLM, or custom HTTP backends.</span>
-          </article>
-          <article class="interface-point">
-            <strong>Benchmark-ready export</strong>
-            <span>Keep readable JSON as the source of truth and export training or QA benchmark files.</span>
+          <article class="card">
+            <span class="eyebrow">Server Deployment</span>
+            <h3>团队生产</h3>
+            <p>用于实验室服务器或共享数据盘，支持 server-folder import、本地模型和团队协作生产。</p>
+            <ul class="list">
+              <li>`scripts/start_public.sh`</li>
+              <li>Docker / Gunicorn / Nginx</li>
+            </ul>
           </article>
         </div>
       </div>
     </section>
 
-    <section id="workflow">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Dataset Production Flow</h2>
-          <p>A complete loop from raw imagery and metadata to model assistance, human review, quality control, benchmark export, and dataset release assets.</p>
-        </div>
-        <figure class="flow-figure">
-          <img src="site-assets/dataset-production-flow.png.png" alt="Dataset production flow from raw imagery and metadata indexing to pre-annotation, human review, quality control, benchmark export, and dataset release">
-          <figcaption class="flow-caption">
-            <span>Raw data to benchmark-ready release assets in one metadata-first workflow.</span>
-            <div class="flow-tags">
-              <span>Raw Imagery</span>
-              <span>Metadata</span>
-              <span>Pre-annotation</span>
-              <span>Human Review</span>
-              <span>QA</span>
-              <span>QC</span>
-              <span>Export</span>
-              <span>Release</span>
-            </div>
-          </figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section id="examples" class="showcase">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Example Projects</h2>
-          <p>UAIV-Labeler is aimed at real remote-sensing use cases, where a dataset may combine object detection, event labels, QA, OCR, and restoration evidence.</p>
-        </div>
-        <div class="project-grid">
-          <article class="project">
-            <small>Urban Governance</small>
-            <strong>Illegal parking and traffic events</strong>
-            <span>Review vehicles, roads, congestion, parking violations, and related event QA from drone imagery.</span>
-          </article>
-          <article class="project">
-            <small>Urban Governance</small>
-            <strong>Garbage dumping and construction activity</strong>
-            <span>Annotate piles, excavators, construction areas, and site-level evidence for governance benchmarks.</span>
-          </article>
-          <article class="project">
-            <small>Emergency Monitoring</small>
-            <strong>Smoke and fire</strong>
-            <span>Combine detection boxes, event QA, and scene metadata to build low-altitude emergency datasets.</span>
-          </article>
-          <article class="project">
-            <small>Environmental Monitoring</small>
-            <strong>Water pollution and vegetation damage</strong>
-            <span>Use polygons, metadata, and QA to inspect river, lake, vegetation, and ecological-risk scenes.</span>
-          </article>
-          <article class="project">
-            <small>Agriculture</small>
-            <strong>Farmland and wetland monitoring</strong>
-            <span>Track land-cover areas, field boundaries, vegetation state, and acquisition conditions.</span>
-          </article>
-          <article class="project">
-            <small>Multimodal QA</small>
-            <strong>Aerial VQA and benchmark review</strong>
-            <span>Inspect image-grounded questions, candidate answers, model traces, and benchmark export files.</span>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="architecture">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Architecture</h2>
-          <p>A lightweight platform stack: browser workbench, annotation engine, pluggable model services, and export tools for benchmark construction.</p>
-        </div>
-        <div class="architecture">
-          <article class="arch-node">
-            <strong>Frontend Workbench</strong>
-            <p>Image canvas, metadata panel, geometry tools, QA review, task filters, and export controls.</p>
-          </article>
-          <article class="arch-node">
-            <strong>Annotation Engine</strong>
-            <p>Readable JSON store, rebuildable SQLite index, status summaries, and quality-control reports.</p>
-          </article>
-          <article class="arch-node">
-            <strong>Model Backends</strong>
-            <p>YOLO, SegEarth, SAM-style prompts, OCR/VLM services, and custom HTTP prediction APIs.</p>
-          </article>
-          <article class="arch-node">
-            <strong>Export Engine</strong>
-            <p>COCO, VOC, YOLO, YOLO-OBB, DOTA, GeoJSON, masks, QA JSONL, and Dataset Card assets.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="showcase">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Publications</h2>
-          <p>Reserved for upcoming dataset papers, benchmark reports, and system descriptions connected to the UAIV ecosystem.</p>
-        </div>
-        <div class="publication-list">
-          <article class="publication">
-            <small>Coming Soon</small>
-            <div>
-              <strong>UAIV dataset release paper</strong>
-              <span>Low-altitude multimodal dataset documentation, benchmark protocol, and data release assets.</span>
-            </div>
-          </article>
-          <article class="publication">
-            <small>Coming Soon</small>
-            <div>
-              <strong>UAIV-Labeler system overview</strong>
-              <span>Metadata-first, model-assisted annotation workflow for aerial observation data construction.</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="showcase">
-      <div class="shell two-col">
-        <div>
-          <div class="section-head">
-            <h2>Project website and platform deployment are separate.</h2>
-          </div>
-          <div class="mode-grid">
-            <article class="mode">
-              <strong>Project Website</strong>
-              <p>This GitHub Pages site is a static product page. It does not run the annotation backend.</p>
-            </article>
-            <article class="mode">
-              <strong>Offline Demo</strong>
-              <p>Local trial with bundled sample_data. Useful for students, demos, and air-gapped previews.</p>
-            </article>
-            <article class="mode">
-              <strong>Online Demo</strong>
-              <p>Hosted Flask app for inspecting the interface and workflow before deploying your own data.</p>
-            </article>
-            <article class="mode">
-              <strong>Server Deploy</strong>
-              <p>Run on a lab server or mounted dataset disk, with local GPU or remote model services.</p>
-            </article>
-          </div>
-        </div>
-        <div class="code-panel">
-          <div class="code-title">
-            <span>Quick start</span>
-            <span>Python 3.10+</span>
-          </div>
-          <pre><code>git clone https://github.com/JennyZhang0810/UAIV-Labeler.git
-cd UAIV-Labeler
-pip install -r requirements.txt
-bash offline_demo/run_offline.sh
-
-# Open locally
-http://127.0.0.1:7860</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section id="roadmap">
-      <div class="shell">
-        <div class="section-head">
-          <h2>Roadmap</h2>
-          <p>The current release already covers core review and export workflows. Next milestones focus on stronger segmentation, larger imagery, collaboration, and dataset release operations.</p>
-        </div>
-        <div class="roadmap-grid">
-          <article class="roadmap-item done">
-            <small>Available</small>
-            <strong>Detection and OBB</strong>
-            <span>Horizontal boxes, oriented boxes, polygons, QA review, and benchmark export are available in the current workflow.</span>
-          </article>
-          <article class="roadmap-item done">
-            <small>Available</small>
-            <strong>Model pre-annotation</strong>
-            <span>YOLO, SegEarth, OCR/VLM, SAM-style services, and custom HTTP backends can be connected.</span>
-          </article>
-          <article class="roadmap-item next">
-            <small>Next</small>
-            <strong>Interactive segmentation</strong>
-            <span>Click and box prompt segmentation with stronger SAM-style review interactions.</span>
-          </article>
-          <article class="roadmap-item next">
-            <small>Next</small>
-            <strong>Large image tiling</strong>
-            <span>Tile-based browsing for large mosaics, wide-area imagery, and GeoTIFF-like data.</span>
-          </article>
-          <article class="roadmap-item next">
-            <small>Next</small>
-            <strong>Multi-user collaboration</strong>
-            <span>Reviewer assignment, audit trails, team status tracking, and database-backed workflows.</span>
-          </article>
-          <article class="roadmap-item next">
-            <small>Next</small>
-            <strong>Dataset release manager</strong>
-            <span>Dataset Card generation, export summaries, release checklists, and paper-ready assets.</span>
-          </article>
-          <article class="roadmap-item">
-            <small>Planned</small>
-            <strong>Full offline package</strong>
-            <span>Self-contained deployments for intranet, no-internet, and secure lab environments.</span>
-          </article>
-          <article class="roadmap-item">
-            <small>Planned</small>
-            <strong>Task template library</strong>
-            <span>Reusable templates for urban governance, ecology, agriculture, emergency response, and restoration tasks.</span>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="cta">
-      <div class="shell cta-inner">
-        <div>
-          <h2>Get Started</h2>
-          <p>Try the live demo, clone the open-source repository, or follow the documentation to run UAIV-Labeler on your own workstation or lab server.</p>
-        </div>
-        <div class="cta-actions">
-          <a class="button primary" href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub Repository</a>
-          <a class="button" href="http://8.137.184.86">Live Demo</a>
-          <a class="button" href="https://github.com/JennyZhang0810/UAIV-Labeler/blob/main/README.md">Documentation</a>
+    <section class="section band" id="links">
+      <div class="section-inner">
+        <h2 class="section-title">关键入口</h2>
+        <p class="section-copy">这四个入口基本覆盖了页面浏览、源码查看、在线演示和中文文档阅读四类最常见的公开访问需求。</p>
+        <div class="grid-4">
+          <a class="card" href="http://8.137.184.86/">
+            <h3>Live Demo</h3>
+            <p>直接打开当前公开预览服务。</p>
+          </a>
+          <a class="card" href="https://github.com/JennyZhang0810/UAIV-Labeler">
+            <h3>GitHub Repository</h3>
+            <p>查看代码、README、部署说明和离线 demo。</p>
+          </a>
+          <a class="card" href="https://github.com/JennyZhang0810/UAIV-Labeler/blob/main/README_zh.md">
+            <h3>中文说明</h3>
+            <p>适合给标注员和中文读者快速上手。</p>
+          </a>
+          <a class="card" href="https://jennyzhang0810.github.io/UAIV-DataHub/">
+            <h3>UAIV DataHub</h3>
+            <p>返回整个 UAIV 数据基座的统一公开入口。</p>
+          </a>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="shell footer-inner">
-      <span>UAIV-Labeler · Data production infrastructure for low-altitude remote sensing</span>
+    <div class="footer-inner">
+      <span>UAIV-Labeler · public project page · updated 2026-06-24</span>
       <div class="footer-links">
-        <a href="https://github.com/JennyZhang0810/UAIV-Labeler/blob/main/README_zh.md">中文文档</a>
-        <a href="DEPLOYMENT.md">部署说明</a>
-        <a href="CUSTOM_MODEL.md">模型接入</a>
+        <a href="https://github.com/JennyZhang0810/UAIV-Labeler">GitHub</a>
+        <a href="../README_zh.md">中文文档</a>
+        <a href="https://jennyzhang0810.github.io/UAIV-DataHub/">DataHub</a>
       </div>
     </div>
   </footer>
